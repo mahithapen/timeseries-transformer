@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Environments
+.venv/
+.conda/
+
+# OS
+.DS_Store
+
+# Data (keep metadata, ignore large raw files by default)
+data/raw/
+data/processed/
+
+# Training artifacts
+results/logs/
+results/checkpoints/
+results/runs/
+
+# Notebooks
+.ipynb_checkpoints/
