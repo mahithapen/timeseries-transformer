@@ -1,139 +1,92 @@
-from __future__ import annotations
-
-import math
-from dataclasses import dataclass
-from typing import Optional, Tuple
-
 import torch
 import torch.nn as nn
 
 
-@dataclass
-class PatchTSTConfig:
-    seq_len: int
-    pred_len: int
-    patch_len: int = 16
-    stride: int = 8
-    d_model: int = 128
-    n_heads: int = 4
-    n_layers: int = 3
-    d_ff: int = 256
-    dropout: float = 0.1
-    channel_independence: bool = True
-    use_instance_norm: bool = True
-    task: str = "forecast"  # "forecast" or "reconstruct"
-
-
-class InstanceNorm(nn.Module):
-    def __init__(self, eps: float = 1e-5):
-        super().__init__()
+class RevIN(nn.Module):
+    def __init__(self, num_features: int, eps=1e-5, affine=True):
+        super(RevIN, self).__init__()
+        self.num_features = num_features
         self.eps = eps
+        self.affine = affine
+        if self.affine:
+            self.affine_weight = nn.Parameter(torch.ones(num_features))
+            self.affine_bias = nn.Parameter(torch.zeros(num_features))
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        # x: [B, C, L]
-        mean = x.mean(dim=-1, keepdim=True)
-        std = x.std(dim=-1, keepdim=True)
-        x_norm = (x - mean) / (std + self.eps)
-        return x_norm, mean, std
+    def forward(self, x, mode: str):
+        if mode == 'norm':
+            self._get_statistics(x)
+            x = (x - self.mean) / (self.stdev + self.eps)
+            if self.affine:
+                x = x * self.affine_weight + self.affine_bias
+        elif mode == 'denorm':
+            if self.affine:
+                x = (x - self.affine_bias) / (self.affine_weight + self.eps)
+            x = x * self.stdev + self.mean
+        return x
 
-
-class PatchEmbedding(nn.Module):
-    def __init__(self, patch_len: int, d_model: int):
-        super().__init__()
-        self.patch_len = patch_len
-        self.proj = nn.Linear(patch_len, d_model)
-
-    def forward(self, patches: torch.Tensor) -> torch.Tensor:
-        # patches: [B, C, N, patch_len]
-        return self.proj(patches)  # [B, C, N, d_model]
-
-
-class PositionalEncoding(nn.Module):
-    def __init__(self, d_model: int, max_len: int = 10000):
-        super().__init__()
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        self.register_buffer("pe", pe.unsqueeze(0))  # [1, max_len, d_model]
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: [B, N, D]
-        return x + self.pe[:, : x.size(1)]
+    def _get_statistics(self, x):
+        # x: [B, L, C]
+        dim2reduce = tuple(range(1, x.ndim-1))
+        self.mean = torch.mean(x, dim=dim2reduce, keepdim=True).detach()
+        self.stdev = torch.sqrt(
+            torch.var(x, dim=dim2reduce, keepdim=True, unbiased=False) + self.eps).detach()
 
 
 class PatchTST(nn.Module):
-    def __init__(self, config: PatchTSTConfig, in_channels: int):
+    def __init__(self, config, in_channels: int):
         super().__init__()
         self.config = config
         self.in_channels = in_channels
-        self.instance_norm = InstanceNorm() if config.use_instance_norm else None
 
-        self.patch_len = config.patch_len
-        self.stride = config.stride
+        # 1. RevIN Implementation
+        self.revin = RevIN(in_channels) if config.use_instance_norm else None
 
-        self.patch_embed = PatchEmbedding(config.patch_len, config.d_model)
+        # Calculate number of patches
+        self.num_patches = int(
+            (config.seq_len - config.patch_len) / config.stride + 2)
+
+        self.patch_embed = nn.Linear(config.patch_len, config.d_model)
         self.positional = PositionalEncoding(config.d_model)
 
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model=config.d_model,
-            nhead=config.n_heads,
-            dim_feedforward=config.d_ff,
-            dropout=config.dropout,
-            batch_first=True,
-            norm_first=True,
+            d_model=config.d_model, nhead=config.n_heads,
+            dim_feedforward=config.d_ff, dropout=config.dropout, batch_first=True
         )
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=config.n_layers)
+        self.encoder = nn.TransformerEncoder(
+            encoder_layer, num_layers=config.n_layers)
 
+        # 2. Flatten Head Implementation
         if config.task == "forecast":
-            self.head = nn.Linear(config.d_model, config.pred_len)
-        else:
-            self.head = nn.Linear(config.d_model, config.patch_len)
+            self.head = nn.Sequential(
+                nn.Flatten(start_dim=-2),
+                nn.Linear(config.d_model * self.num_patches, config.pred_len)
+            )
 
-    def _patchify(self, x: torch.Tensor) -> torch.Tensor:
-        # x: [B, C, L]
-        return x.unfold(dimension=-1, size=self.patch_len, step=self.stride)  # [B, C, N, patch_len]
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor):
         # x: [B, L, C]
-        x = x.transpose(1, 2)  # [B, C, L]
-        if self.instance_norm is not None:
-            x, mean, std = self.instance_norm(x)
-        else:
-            mean = std = None
+        if self.revin:
+            x = self.revin(x, 'norm')
 
-        patches = self._patchify(x)  # [B, C, N, patch_len]
-        b, c, n, p = patches.shape
-        tokens = self.patch_embed(patches)  # [B, C, N, D]
+        # 3. Channel Independence Reshape
+        B, L, C = x.shape
+        x = x.permute(0, 2, 1).reshape(B * C, L, 1)  # [B*C, L, 1]
 
-        if self.config.channel_independence:
-            tokens = tokens.reshape(b * c, n, -1)
-        else:
-            tokens = tokens.reshape(b, c * n, -1)
+        # Patching
+        x = x.unfold(dimension=1, size=self.config.patch_len,
+                     step=self.config.stride)
+        # x: [B*C, num_patches, patch_len]
 
-        tokens = self.positional(tokens)
-        enc = self.encoder(tokens)
+        # Backbone
+        z = self.patch_embed(x)
+        z = self.positional(z)
+        z = self.encoder(z)  # [B*C, num_patches, d_model]
 
-        if self.config.task == "forecast":
-            out = self.head(enc)  # [B*C, N, pred_len] or [B, C*N, pred_len]
-            if self.config.channel_independence:
-                out = out.view(b, c, n, -1).mean(dim=2)  # [B, C, pred_len]
-            else:
-                out = out.view(b, c, n, -1).mean(dim=2)
-        else:
-            out = self.head(enc)  # [B*C, N, patch_len]
-            if self.config.channel_independence:
-                out = out.view(b, c, n, -1)
-            else:
-                out = out.view(b, c, n, -1)
+        # Head
+        z = self.head(z)  # [B*C, pred_len]
 
-        if self.instance_norm is not None and mean is not None and std is not None:
-            if self.config.task == "forecast":
-                out = out * std + mean
-            else:
-                out = out
+        # Reshape back and Denormalize
+        z = z.reshape(B, C, -1).permute(0, 2, 1)  # [B, pred_len, C]
+        if self.revin:
+            z = self.revin(z, 'denorm')
 
-        if self.config.task == "forecast":
-            return out.transpose(1, 2)  # [B, pred_len, C]
-        return out  # [B, C, N, patch_len]
+        return z
