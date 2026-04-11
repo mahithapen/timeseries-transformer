@@ -5,16 +5,18 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import os
 from torch.utils.data import DataLoader
 
-from data.window_dataset import WindowDataset
+# Updated imports to use the TimeSeriesLoader for CSV support
+from data.window_dataset import TimeSeriesLoader
 from models.patchtst import PatchTST, PatchTSTConfig
 from utils.seed import set_seed
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="PatchTST training")
-    parser.add_argument("--data", type=str, required=False, default="", help="Path to .npy series")
+    parser.add_argument("--data", type=str, required=False, default="", help="Path to .csv or .npy series")
     parser.add_argument("--seq-len", type=int, default=336)
     parser.add_argument("--pred-len", type=int, default=96)
     parser.add_argument("--patch-len", type=int, default=16)
@@ -24,7 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n-layers", type=int, default=3)
     parser.add_argument("--d-ff", type=int, default=256)
     parser.add_argument("--dropout", type=float, default=0.1)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=42)
@@ -36,13 +38,30 @@ def main() -> None:
     args = parse_args()
     set_seed(args.seed)
 
-    if args.data:
-        series = np.load(args.data)
-    else:
-        # Placeholder synthetic data for quick sanity checks
-        series = np.random.randn(2000, 8).astype(np.float32)
+    # Path to the data directory relative to this script
+    root_path = './data/'
 
-    dataset = WindowDataset(series, args.seq_len, args.pred_len)
+    if args.data and args.data.endswith('.csv'):
+        print(f"Loading CSV dataset: {args.data}")
+        # Initialize the CSV loader specifically for datasets like Jena Weather
+        dataset = TimeSeriesLoader(
+            root_path=root_path,
+            data_path=args.data,
+            flag='train',
+            size=[args.seq_len, args.pred_len],
+            scale=True
+        )
+        # Determine in_channels from the features in the processed dataframe
+        in_channels = dataset.data_x.shape[-1]
+    else:
+        # Fallback to synthetic data if no CSV is provided
+        print("Using synthetic data for training.")
+        series = np.random.randn(2000, 8).astype(np.float32)
+        in_channels = 8
+        # You would need a separate WindowDataset class if using raw numpy arrays
+        from data.window_dataset import WindowDataset
+        dataset = WindowDataset(series, args.seq_len, args.pred_len)
+
     loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
     config = PatchTSTConfig(
@@ -58,10 +77,11 @@ def main() -> None:
         task="forecast",
     )
 
-    model = PatchTST(config, in_channels=series.shape[1]).to(args.device)
+    model = PatchTST(config, in_channels=in_channels).to(args.device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = torch.nn.MSELoss()
 
+    print(f"Starting training on {args.device} for {args.epochs} epochs...")
     model.train()
     for epoch in range(args.epochs):
         total_loss = 0.0
