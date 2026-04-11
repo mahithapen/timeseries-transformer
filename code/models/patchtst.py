@@ -1,7 +1,10 @@
-import torch
-import torch.nn as nn
+from __future__ import annotations
+
 import math
 from dataclasses import dataclass
+
+import torch
+import torch.nn as nn
 
 @dataclass
 class PatchTSTConfig:
@@ -16,6 +19,7 @@ class PatchTSTConfig:
     dropout: float = 0.1
     use_instance_norm: bool = True
     task: str = "forecast"
+    mask_ratio: float = 0.4
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_len: int = 5000):
@@ -64,6 +68,7 @@ class PatchTST(nn.Module):
         
         self.patch_embed = nn.Linear(config.patch_len, config.d_model)
         self.positional = PositionalEncoding(config.d_model)
+        self.mask_token = nn.Parameter(torch.zeros(1, 1, config.d_model))
 
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=config.d_model, nhead=config.n_heads,
@@ -71,38 +76,67 @@ class PatchTST(nn.Module):
         )
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=config.n_layers)
 
-        if config.task == "forecast":
-            self.head = nn.Sequential(
-                nn.Flatten(start_dim=-2),
-                nn.Linear(config.d_model * self.num_patches, config.pred_len)
-            )
-        else:
-            self.head = nn.Linear(config.d_model, config.patch_len)
+        self.forecast_head = nn.Sequential(
+            nn.Flatten(start_dim=-2),
+            nn.Linear(config.d_model * self.num_patches, config.pred_len)
+        )
+        self.reconstruction_head = nn.Linear(config.d_model, config.patch_len)
+
+    def _patchify(self, x: torch.Tensor) -> torch.Tensor:
+        bsz, seq_len, channels = x.shape
+        x = x.permute(0, 2, 1).reshape(bsz * channels, seq_len)
+        return x.unfold(dimension=-1, size=self.config.patch_len, step=self.config.stride)
+
+    def _encode_patches(self, patches: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+        z = self.patch_embed(patches)
+        if mask is not None:
+            mask_token = self.mask_token.expand(z.size(0), z.size(1), -1)
+            z = torch.where(mask.unsqueeze(-1), mask_token, z)
+        z = self.positional(z)
+        return self.encoder(z)
+
+    def _random_patch_mask(self, batch_size: int, mask_ratio: float, device: torch.device) -> torch.Tensor:
+        mask = torch.rand(batch_size, self.num_patches, device=device) < mask_ratio
+        empty_rows = mask.sum(dim=1) == 0
+        if empty_rows.any():
+            random_index = torch.randint(self.num_patches, (int(empty_rows.sum().item()),), device=device)
+            mask[empty_rows, random_index] = True
+        return mask
+
+    def forward_pretrain(
+        self,
+        x: torch.Tensor,
+        mask_ratio: float | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        if self.revin:
+            x = self.revin(x, 'norm')
+
+        patches = self._patchify(x)
+        mask = self._random_patch_mask(
+            batch_size=patches.size(0),
+            mask_ratio=self.config.mask_ratio if mask_ratio is None else mask_ratio,
+            device=patches.device,
+        )
+        encoded = self._encode_patches(patches, mask=mask)
+        reconstructed = self.reconstruction_head(encoded)
+
+        bsz = x.size(0)
+        channels = x.size(2)
+        reconstructed = reconstructed.reshape(bsz, channels, self.num_patches, self.config.patch_len)
+        target = patches.reshape(bsz, channels, self.num_patches, self.config.patch_len)
+        mask = mask.reshape(bsz, channels, self.num_patches)
+        return reconstructed, target, mask
 
     def forward(self, x: torch.Tensor):
-        if self.revin: x = self.revin(x, 'norm')
-        
-        B, L, C = x.shape
-        # Channel Independence: [B, L, C] -> [B*C, L] 
-        # (Removing the extra dim prevents the 4D error)
-        x = x.permute(0, 2, 1).reshape(B * C, L)
-        
-        # Patching: Result is [B*C, num_patches, patch_len] (3D)
-        x = x.unfold(dimension=-1, size=self.config.patch_len, step=self.config.stride)
-        
-        # Backbone
-        z = self.patch_embed(x)
-        z = self.positional(z)
-        z = self.encoder(z) 
+        if self.revin:
+            x = self.revin(x, 'norm')
 
-        # Head and Reshape back to [B, pred_len, C]
-        if self.config.task == "forecast":
-            z = self.head(z) 
-            z = z.reshape(B, C, -1).permute(0, 2, 1)
-        else:
-            z = self.head(z)
-            z = z.reshape(B, C, self.num_patches, -1)
+        bsz, _, channels = x.shape
+        patches = self._patchify(x)
+        encoded = self._encode_patches(patches)
+        forecast = self.forecast_head(encoded)
+        forecast = forecast.reshape(bsz, channels, -1).permute(0, 2, 1)
 
-        if self.revin and self.config.task == "forecast":
-            z = self.revin(z, 'denorm')
-        return z
+        if self.revin:
+            forecast = self.revin(forecast, 'denorm')
+        return forecast

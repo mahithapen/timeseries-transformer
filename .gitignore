@@ -19,6 +19,7 @@ data/raw/
 data/processed/
 
 # Training artifacts
+checkpoints/
 results/logs/
 results/checkpoints/
 results/runs/

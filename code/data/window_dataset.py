@@ -1,98 +1,203 @@
-import os
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
 import pandas as pd
 import torch
-import numpy as np
-from torch.utils.data import Dataset
 from sklearn.preprocessing import StandardScaler
+from torch.utils.data import Dataset
 
-class TimeSeriesLoader(Dataset):
-    """
-    Data loader for CSV time-series datasets (e.g., Jena Weather, Electricity).
-    Handles scaling, train/val/test splits, and multi-channel formatting.
-    """
-    def __init__(self, root_path, data_path, flag='train', size=None, 
-                 target='T (degC)', scale=True):
-        # size [seq_len, pred_len]
-        self.seq_len = size[0]
-        self.pred_len = size[1]
-        
-        assert flag in ['train', 'test', 'val']
-        type_map = {'train': 0, 'val': 1, 'test': 2}
-        self.set_type = type_map[flag]
-        
-        self.target = target
-        self.scale = scale
-        self.root_path = root_path
-        self.data_path = data_path
-        self.__read_data__()
 
-    def __read_data__(self):
-        self.scaler = StandardScaler()
-        df_raw = pd.read_csv(os.path.join(self.root_path, self.data_path))
+@dataclass
+class DatasetBundle:
+    train: Dataset
+    val: Dataset
+    test: Dataset
+    in_channels: int
+    scaler: StandardScaler | None
+    series_length: int
 
-        # 1. Handle Timestamp Column
-        # The Kaggle Jena file uses "Date Time"
-        cols = list(df_raw.columns)
-        if 'Date Time' in cols:
-            df_raw = df_raw.drop(columns=['Date Time'])
-        elif 'date' in cols:
-            df_raw = df_raw.drop(columns=['date'])
-        
-        # 2. Re-order to ensure target is the last column if needed
-        # PatchTST typically processes all channels independently
-        df_data = df_raw.copy()
 
-        # 3. Calculate Splits (Standard 70/10/20 split)
-        num_train = int(len(df_raw) * 0.7)
-        num_test = int(len(df_raw) * 0.2)
-        num_vali = len(df_raw) - num_train - num_test
-        
-        border1s = [0, num_train - self.seq_len, len(df_raw) - num_test - self.seq_len]
-        border2s = [num_train, num_train + num_vali, len(df_raw)]
-        
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
+def load_time_series(data_path: str | Path) -> np.ndarray:
+    path = Path(data_path)
+    suffix = path.suffix.lower()
 
-        # 4. Scaling
-        if self.scale:
-            # Fit scaler only on training data to prevent data leakage
-            train_data = df_data[border1s[0]:border2s[0]]
-            self.scaler.fit(train_data.values)
-            data = self.scaler.transform(df_data.values)
+    if suffix == ".csv":
+        frame = pd.read_csv(path)
+        numeric = frame.select_dtypes(include=[np.number])
+        if numeric.empty:
+            raise ValueError(f"No numeric columns found in {path}")
+        series = numeric.to_numpy(dtype=np.float32, copy=True)
+    elif suffix in {".npy", ".npz"}:
+        loaded = np.load(path)
+        if isinstance(loaded, np.lib.npyio.NpzFile):
+            keys = list(loaded.keys())
+            if not keys:
+                raise ValueError(f"No arrays found in {path}")
+            series = loaded[keys[0]]
         else:
-            data = df_data.values
+            series = loaded
+        series = np.asarray(series, dtype=np.float32)
+    else:
+        raise ValueError(f"Unsupported file type: {path.suffix}")
 
-        self.data_x = data[border1:border2]
-        self.data_y = data[border1:border2]
+    if series.ndim == 1:
+        series = series[:, None]
+    if series.ndim != 2:
+        raise ValueError(f"Expected a 2D time series array, got shape {series.shape}")
+    if not np.isfinite(series).all():
+        raise ValueError(f"Found non-finite values in {path}")
 
-    def __getitem__(self, index):
-        # Sliding window indices
-        s_begin = index
-        s_end = s_begin + self.seq_len
-        r_begin = s_end
-        r_end = r_begin + self.pred_len
+    return series.astype(np.float32, copy=False)
 
-        seq_x = self.data_x[s_begin:s_end]
-        seq_y = self.data_y[r_begin:r_end]
 
-        return torch.tensor(seq_x, dtype=torch.float32), torch.tensor(seq_y, dtype=torch.float32)
-
-    def __len__(self):
-        return len(self.data_x) - self.seq_len - self.pred_len + 1
-
-class WindowDataset(Dataset):
-    """
-    Fallback loader for raw numpy arrays (Synthetic Data).
-    """
-    def __init__(self, data: np.ndarray, seq_len: int, pred_len: int):
-        self.data = data
+class ForecastWindowDataset(Dataset):
+    def __init__(
+        self,
+        series: np.ndarray,
+        seq_len: int,
+        pred_len: int,
+        target_start: int,
+        target_end: int,
+    ) -> None:
+        self.series = series
         self.seq_len = seq_len
         self.pred_len = pred_len
+        self.target_start = target_start
+        self.target_end = target_end
+
+        if self.target_end <= self.target_start:
+            raise ValueError(
+                f"Empty split for seq_len={seq_len}, pred_len={pred_len}, "
+                f"target range=({target_start}, {target_end})"
+            )
 
     def __len__(self) -> int:
-        return len(self.data) - self.seq_len - self.pred_len
+        return self.target_end - self.target_start
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        x = self.data[idx : idx + self.seq_len]
-        y = self.data[idx + self.seq_len : idx + self.seq_len + self.pred_len]
-        return torch.from_numpy(x), torch.from_numpy(y)
+        t = self.target_start + idx
+        x = self.series[t - self.seq_len : t]
+        y = self.series[t : t + self.pred_len]
+        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+
+
+class ContextWindowDataset(Dataset):
+    def __init__(self, series: np.ndarray, seq_len: int, target_start: int, target_end: int) -> None:
+        self.series = series
+        self.seq_len = seq_len
+        self.target_start = target_start
+        self.target_end = target_end
+
+        if self.target_end <= self.target_start:
+            raise ValueError(
+                f"Empty split for seq_len={seq_len}, target range=({target_start}, {target_end})"
+            )
+
+    def __len__(self) -> int:
+        return self.target_end - self.target_start
+
+    def __getitem__(self, idx: int) -> torch.Tensor:
+        t = self.target_start + idx
+        x = self.series[t - self.seq_len : t]
+        return torch.tensor(x, dtype=torch.float32)
+
+
+def _compute_split_points(length: int, val_ratio: float, test_ratio: float) -> tuple[int, int]:
+    if not 0.0 <= val_ratio < 1.0 or not 0.0 <= test_ratio < 1.0:
+        raise ValueError("val_ratio and test_ratio must be in [0, 1)")
+    if val_ratio + test_ratio >= 1.0:
+        raise ValueError("val_ratio + test_ratio must be less than 1")
+
+    train_end = int(length * (1.0 - val_ratio - test_ratio))
+    val_end = int(length * (1.0 - test_ratio))
+    return train_end, val_end
+
+
+def build_datasets(
+    data_path: str | Path,
+    seq_len: int,
+    pred_len: int,
+    val_ratio: float = 0.1,
+    test_ratio: float = 0.2,
+    scale: bool = True,
+) -> DatasetBundle:
+    series = load_time_series(data_path)
+    total_length = len(series)
+    train_end, val_end = _compute_split_points(total_length, val_ratio, test_ratio)
+
+    min_required = seq_len + pred_len + 1
+    if train_end < min_required:
+        raise ValueError(
+            f"Training split is too small for seq_len={seq_len} and pred_len={pred_len}. "
+            f"Need at least {min_required} timesteps before the train boundary, got {train_end}."
+        )
+
+    scaler: StandardScaler | None = None
+    processed = series
+    if scale:
+        scaler = StandardScaler()
+        scaler.fit(series[:train_end])
+        processed = scaler.transform(series).astype(np.float32)
+
+    train = ForecastWindowDataset(
+        processed,
+        seq_len=seq_len,
+        pred_len=pred_len,
+        target_start=seq_len,
+        target_end=train_end - pred_len + 1,
+    )
+    val = ForecastWindowDataset(
+        processed,
+        seq_len=seq_len,
+        pred_len=pred_len,
+        target_start=train_end,
+        target_end=val_end - pred_len + 1,
+    )
+    test = ForecastWindowDataset(
+        processed,
+        seq_len=seq_len,
+        pred_len=pred_len,
+        target_start=val_end,
+        target_end=total_length - pred_len + 1,
+    )
+
+    return DatasetBundle(
+        train=train,
+        val=val,
+        test=test,
+        in_channels=processed.shape[1],
+        scaler=scaler,
+        series_length=total_length,
+    )
+
+
+def build_pretrain_dataset(
+    data_path: str | Path,
+    seq_len: int,
+    val_ratio: float = 0.1,
+    test_ratio: float = 0.2,
+    scale: bool = True,
+) -> tuple[ContextWindowDataset, int]:
+    series = load_time_series(data_path)
+    train_end, _ = _compute_split_points(len(series), val_ratio, test_ratio)
+
+    if train_end <= seq_len:
+        raise ValueError(
+            f"Training split is too small for seq_len={seq_len}. Need more than {seq_len} timesteps."
+        )
+
+    if scale:
+        scaler = StandardScaler()
+        scaler.fit(series[:train_end])
+        series = scaler.transform(series).astype(np.float32)
+
+    dataset = ContextWindowDataset(
+        series,
+        seq_len=seq_len,
+        target_start=seq_len,
+        target_end=train_end + 1,
+    )
+    return dataset, series.shape[1]
