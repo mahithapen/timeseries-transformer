@@ -59,49 +59,45 @@ class ForecastWindowDataset(Dataset):
         series: np.ndarray,
         seq_len: int,
         pred_len: int,
-        target_start: int,
-        target_end: int,
     ) -> None:
         self.series = series
         self.seq_len = seq_len
         self.pred_len = pred_len
-        self.target_start = target_start
-        self.target_end = target_end
 
-        if self.target_end <= self.target_start:
+        if len(self.series) < self.seq_len + self.pred_len:
             raise ValueError(
-                f"Empty split for seq_len={seq_len}, pred_len={pred_len}, "
-                f"target range=({target_start}, {target_end})"
+                f"Split is too small for seq_len={seq_len} and pred_len={pred_len}. "
+                f"Need at least {self.seq_len + self.pred_len} timesteps, got {len(self.series)}."
             )
 
     def __len__(self) -> int:
-        return self.target_end - self.target_start
+        return len(self.series) - self.seq_len - self.pred_len + 1
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        t = self.target_start + idx
-        x = self.series[t - self.seq_len : t]
-        y = self.series[t : t + self.pred_len]
+        seq_start = idx
+        seq_end = seq_start + self.seq_len
+        pred_end = seq_end + self.pred_len
+        x = self.series[seq_start:seq_end]
+        y = self.series[seq_end:pred_end]
         return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 
 class ContextWindowDataset(Dataset):
-    def __init__(self, series: np.ndarray, seq_len: int, target_start: int, target_end: int) -> None:
+    def __init__(self, series: np.ndarray, seq_len: int) -> None:
         self.series = series
         self.seq_len = seq_len
-        self.target_start = target_start
-        self.target_end = target_end
 
-        if self.target_end <= self.target_start:
+        if len(self.series) < self.seq_len:
             raise ValueError(
-                f"Empty split for seq_len={seq_len}, target range=({target_start}, {target_end})"
+                f"Split is too small for seq_len={seq_len}. Need at least {self.seq_len} timesteps, "
+                f"got {len(self.series)}."
             )
 
     def __len__(self) -> int:
-        return self.target_end - self.target_start
+        return len(self.series) - self.seq_len + 1
 
     def __getitem__(self, idx: int) -> torch.Tensor:
-        t = self.target_start + idx
-        x = self.series[t - self.seq_len : t]
+        x = self.series[idx : idx + self.seq_len]
         return torch.tensor(x, dtype=torch.float32)
 
 
@@ -116,6 +112,55 @@ def _compute_split_points(length: int, val_ratio: float, test_ratio: float) -> t
     return train_end, val_end
 
 
+def _compute_split_borders(
+    length: int,
+    seq_len: int,
+    val_ratio: float,
+    test_ratio: float,
+) -> tuple[list[int], list[int]]:
+    train_end, val_end = _compute_split_points(length, val_ratio, test_ratio)
+    border1s = [0, train_end - seq_len, val_end - seq_len]
+    border2s = [train_end, val_end, length]
+    return border1s, border2s
+
+
+def _compute_ett_split_borders(data_path: str | Path, seq_len: int) -> tuple[list[int], list[int]] | None:
+    stem = Path(data_path).stem.lower()
+    if stem.startswith("etth"):
+        train_end = 12 * 30 * 24
+        val_end = train_end + 4 * 30 * 24
+        test_end = val_end + 4 * 30 * 24
+    elif stem.startswith("ettm"):
+        train_end = 12 * 30 * 24 * 4
+        val_end = train_end + 4 * 30 * 24 * 4
+        test_end = val_end + 4 * 30 * 24 * 4
+    else:
+        return None
+
+    border1s = [0, train_end - seq_len, val_end - seq_len]
+    border2s = [train_end, val_end, test_end]
+    return border1s, border2s
+
+
+def _resolve_split_borders(
+    data_path: str | Path,
+    length: int,
+    seq_len: int,
+    val_ratio: float,
+    test_ratio: float,
+) -> tuple[list[int], list[int]]:
+    ett_borders = _compute_ett_split_borders(data_path, seq_len)
+    if ett_borders is not None:
+        border1s, border2s = ett_borders
+        if border2s[-1] > length:
+            raise ValueError(
+                f"ETT hardcoded split boundaries expect at least {border2s[-1]} timesteps, got {length}."
+            )
+        return border1s, border2s
+
+    return _compute_split_borders(length, seq_len, val_ratio, test_ratio)
+
+
 def build_datasets(
     data_path: str | Path,
     seq_len: int,
@@ -126,13 +171,26 @@ def build_datasets(
 ) -> DatasetBundle:
     series = load_time_series(data_path)
     total_length = len(series)
-    train_end, val_end = _compute_split_points(total_length, val_ratio, test_ratio)
+    border1s, border2s = _resolve_split_borders(
+        data_path=data_path,
+        length=total_length,
+        seq_len=seq_len,
+        val_ratio=val_ratio,
+        test_ratio=test_ratio,
+    )
+    train_start, val_start, test_start = border1s
+    train_end, val_end, test_end = border2s
 
-    min_required = seq_len + pred_len + 1
+    min_required = seq_len + pred_len
     if train_end < min_required:
         raise ValueError(
             f"Training split is too small for seq_len={seq_len} and pred_len={pred_len}. "
             f"Need at least {min_required} timesteps before the train boundary, got {train_end}."
+        )
+    if val_start < 0 or test_start < 0:
+        raise ValueError(
+            f"Validation/test splits are too small for seq_len={seq_len}. "
+            "Reduce seq_len or increase the dataset length."
         )
 
     scaler: StandardScaler | None = None
@@ -143,25 +201,19 @@ def build_datasets(
         processed = scaler.transform(series).astype(np.float32)
 
     train = ForecastWindowDataset(
-        processed,
+        processed[train_start:train_end],
         seq_len=seq_len,
         pred_len=pred_len,
-        target_start=seq_len,
-        target_end=train_end - pred_len + 1,
     )
     val = ForecastWindowDataset(
-        processed,
+        processed[val_start:val_end],
         seq_len=seq_len,
         pred_len=pred_len,
-        target_start=train_end,
-        target_end=val_end - pred_len + 1,
     )
     test = ForecastWindowDataset(
-        processed,
+        processed[test_start:test_end],
         seq_len=seq_len,
         pred_len=pred_len,
-        target_start=val_end,
-        target_end=total_length - pred_len + 1,
     )
 
     return DatasetBundle(
@@ -182,11 +234,19 @@ def build_pretrain_dataset(
     scale: bool = True,
 ) -> tuple[ContextWindowDataset, int]:
     series = load_time_series(data_path)
-    train_end, _ = _compute_split_points(len(series), val_ratio, test_ratio)
+    border1s, border2s = _resolve_split_borders(
+        data_path=data_path,
+        length=len(series),
+        seq_len=seq_len,
+        val_ratio=val_ratio,
+        test_ratio=test_ratio,
+    )
+    train_start = border1s[0]
+    train_end = border2s[0]
 
-    if train_end <= seq_len:
+    if train_end < seq_len:
         raise ValueError(
-            f"Training split is too small for seq_len={seq_len}. Need more than {seq_len} timesteps."
+            f"Training split is too small for seq_len={seq_len}. Need at least {seq_len} timesteps."
         )
 
     if scale:
@@ -194,10 +254,5 @@ def build_pretrain_dataset(
         scaler.fit(series[:train_end])
         series = scaler.transform(series).astype(np.float32)
 
-    dataset = ContextWindowDataset(
-        series,
-        seq_len=seq_len,
-        target_start=seq_len,
-        target_end=train_end + 1,
-    )
+    dataset = ContextWindowDataset(series[train_start:train_end], seq_len=seq_len)
     return dataset, series.shape[1]

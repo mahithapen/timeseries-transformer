@@ -19,20 +19,59 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pred-len", type=int, default=96)
     parser.add_argument("--patch-len", type=int, default=16)
     parser.add_argument("--stride", type=int, default=8)
+    parser.add_argument(
+        "--hierarchical-patching",
+        action="store_true",
+        help="Enable multi-scale hierarchical patching with progressive token merging.",
+    )
+    parser.add_argument(
+        "--hierarchical-levels",
+        type=int,
+        default=2,
+        help="Number of hierarchical encoder levels when hierarchical patching is enabled.",
+    )
+    parser.add_argument(
+        "--hierarchical-merge-factor",
+        type=int,
+        default=2,
+        help="How many adjacent patch tokens to merge between hierarchical levels.",
+    )
     parser.add_argument("--d-model", type=int, default=128)
     parser.add_argument("--n-heads", type=int, default=4)
     parser.add_argument("--n-layers", type=int, default=3)
     parser.add_argument("--d-ff", type=int, default=256)
     parser.add_argument("--dropout", type=float, default=0.1)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--fc-dropout", type=float, default=0.1)
+    parser.add_argument("--head-dropout", type=float, default=0.0)
+    parser.add_argument(
+        "--padding-patch",
+        type=str,
+        choices=["end", "none"],
+        default="end",
+        help="Patch padding strategy. Use 'end' to match the paper's extra trailing patch.",
+    )
+    parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--pretrain-epochs", type=int, default=0)
     parser.add_argument("--pretrain-mask-ratio", type=float, default=0.4)
-    parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--pretrain-lr", type=float, default=1e-3)
+    parser.add_argument("--batch-size", type=int, default=128)
+    parser.add_argument("--lr", type=float, default=1e-4)
+    parser.add_argument("--pretrain-lr", type=float, default=1e-4)
+    parser.add_argument("--patience", type=int, default=20, help="Early stopping patience on validation loss")
+    parser.add_argument(
+        "--scheduler",
+        type=str,
+        choices=["type3", "none"],
+        default="type3",
+        help="Learning rate scheduler for supervised training",
+    )
     parser.add_argument("--val-ratio", type=float, default=0.1)
     parser.add_argument("--test-ratio", type=float, default=0.2)
     parser.add_argument("--no-scale", action="store_true", help="Disable train-split normalization")
+    parser.add_argument(
+        "--revin-affine",
+        action="store_true",
+        help="Enable affine parameters in RevIN. Disabled by default to better match the paper recipe.",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--checkpoint", type=str, default="checkpoints/patchtst_best.pt")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
@@ -45,13 +84,20 @@ def build_config(args: argparse.Namespace) -> PatchTSTConfig:
         pred_len=args.pred_len,
         patch_len=args.patch_len,
         stride=args.stride,
+        hierarchical_patching=args.hierarchical_patching,
+        hierarchical_levels=args.hierarchical_levels,
+        hierarchical_merge_factor=args.hierarchical_merge_factor,
         d_model=args.d_model,
         n_heads=args.n_heads,
         n_layers=args.n_layers,
         d_ff=args.d_ff,
         dropout=args.dropout,
+        fc_dropout=args.fc_dropout,
+        head_dropout=args.head_dropout,
         task="forecast",
         mask_ratio=args.pretrain_mask_ratio,
+        revin_affine=args.revin_affine,
+        padding_patch=None if args.padding_patch == "none" else args.padding_patch,
     )
 
 
@@ -65,6 +111,35 @@ def evaluate_forecast(model: PatchTST, loader: DataLoader, device: str, criterio
             pred = model(x)
             total_loss += criterion(pred, y).item()
     return total_loss / max(1, len(loader))
+
+
+class EarlyStopping:
+    def __init__(self, patience: int) -> None:
+        self.patience = patience
+        self.best_loss = float("inf")
+        self.num_bad_epochs = 0
+
+    def step(self, loss: float) -> bool:
+        if loss < self.best_loss:
+            self.best_loss = loss
+            self.num_bad_epochs = 0
+            return False
+
+        self.num_bad_epochs += 1
+        return self.num_bad_epochs >= self.patience
+
+
+def adjust_learning_rate(optimizer: torch.optim.Optimizer, epoch: int, base_lr: float, schedule: str) -> float:
+    if schedule == "none":
+        lr = base_lr
+    elif schedule == "type3":
+        lr = base_lr if epoch < 3 else base_lr * (0.9 ** (epoch - 3))
+    else:
+        raise ValueError(f"Unsupported scheduler: {schedule}")
+
+    for param_group in optimizer.param_groups:
+        param_group["lr"] = lr
+    return lr
 
 
 def run_pretraining(
@@ -139,11 +214,13 @@ def main() -> None:
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = torch.nn.MSELoss()
     best_val_loss = float("inf")
+    early_stopper = EarlyStopping(args.patience)
     checkpoint_path = Path(args.checkpoint)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Starting supervised training on {args.device} for {args.epochs} epochs...")
     for epoch in range(args.epochs):
+        current_lr = adjust_learning_rate(optimizer, epoch + 1, args.lr, args.scheduler)
         model.train()
         total_loss = 0.0
         for x, y in train_loader:
@@ -162,7 +239,8 @@ def main() -> None:
         train_loss = total_loss / max(1, len(train_loader))
         val_loss = evaluate_forecast(model, val_loader, args.device, criterion)
         print(
-            f"Epoch {epoch + 1}/{args.epochs} - train_loss: {train_loss:.4f} - val_loss: {val_loss:.4f}"
+            f"Epoch {epoch + 1}/{args.epochs} - lr: {current_lr:.6g} - "
+            f"train_loss: {train_loss:.4f} - val_loss: {val_loss:.4f}"
         )
 
         if val_loss < best_val_loss:
@@ -183,6 +261,10 @@ def main() -> None:
                 checkpoint_path,
             )
             print(f"Saved checkpoint to {checkpoint_path}")
+
+        if early_stopper.step(val_loss):
+            print(f"Early stopping triggered after {epoch + 1} epochs.")
+            break
 
 
 if __name__ == "__main__":

@@ -12,14 +12,21 @@ class PatchTSTConfig:
     pred_len: int
     patch_len: int = 16
     stride: int = 8
+    hierarchical_patching: bool = False
+    hierarchical_levels: int = 2
+    hierarchical_merge_factor: int = 2
     d_model: int = 128
     n_heads: int = 4
     n_layers: int = 3
     d_ff: int = 256
     dropout: float = 0.1
+    fc_dropout: float = 0.1
+    head_dropout: float = 0.0
     use_instance_norm: bool = True
+    revin_affine: bool = False
     task: str = "forecast"
     mask_ratio: float = 0.4
+    padding_patch: str | None = "end"
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_len: int = 5000):
@@ -61,30 +68,58 @@ class PatchTST(nn.Module):
         super().__init__()
         self.config = config
         self.in_channels = in_channels
-        self.revin = RevIN(in_channels) if config.use_instance_norm else None
-        
-        # Fixed: Correct math for number of patches using unfold
+        self.revin = RevIN(in_channels, affine=config.revin_affine) if config.use_instance_norm else None
+        self.hierarchical_patching = config.hierarchical_patching
+        self.hierarchical_levels = max(1, config.hierarchical_levels)
+        self.hierarchical_merge_factor = config.hierarchical_merge_factor
+        if self.hierarchical_merge_factor < 2:
+            raise ValueError("hierarchical_merge_factor must be at least 2")
+
+        self.pad_layer = None
         self.num_patches = (config.seq_len - config.patch_len) // config.stride + 1
+        if config.padding_patch == "end":
+            self.pad_layer = nn.ReplicationPad1d((0, config.stride))
+            self.num_patches += 1
         
         self.patch_embed = nn.Linear(config.patch_len, config.d_model)
         self.positional = PositionalEncoding(config.d_model)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, config.d_model))
-
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=config.d_model, nhead=config.n_heads,
-            dim_feedforward=config.d_ff, dropout=config.dropout, batch_first=True
-        )
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=config.n_layers)
+        if self.hierarchical_patching:
+            self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
+            self.merge_layers = nn.ModuleList(
+                nn.Linear(config.d_model * self.hierarchical_merge_factor, config.d_model)
+                for _ in range(self.hierarchical_levels - 1)
+            )
+            self.fusion_norm = nn.LayerNorm(config.d_model)
+        else:
+            self.encoder = self._build_encoder()
+            self.merge_layers = nn.ModuleList()
+            self.fusion_norm = nn.Identity()
 
         self.forecast_head = nn.Sequential(
             nn.Flatten(start_dim=-2),
-            nn.Linear(config.d_model * self.num_patches, config.pred_len)
+            nn.Dropout(config.fc_dropout),
+            nn.Linear(config.d_model * self.num_patches, config.pred_len),
+            nn.Dropout(config.head_dropout),
         )
         self.reconstruction_head = nn.Linear(config.d_model, config.patch_len)
+
+    def _build_encoder(self) -> nn.TransformerEncoder:
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=self.config.d_model,
+            nhead=self.config.n_heads,
+            dim_feedforward=self.config.d_ff,
+            dropout=self.config.dropout,
+            activation="gelu",
+            batch_first=True,
+        )
+        return nn.TransformerEncoder(encoder_layer, num_layers=self.config.n_layers)
 
     def _patchify(self, x: torch.Tensor) -> torch.Tensor:
         bsz, seq_len, channels = x.shape
         x = x.permute(0, 2, 1).reshape(bsz * channels, seq_len)
+        if self.pad_layer is not None:
+            x = self.pad_layer(x)
         return x.unfold(dimension=-1, size=self.config.patch_len, step=self.config.stride)
 
     def _encode_patches(self, patches: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
@@ -92,8 +127,41 @@ class PatchTST(nn.Module):
         if mask is not None:
             mask_token = self.mask_token.expand(z.size(0), z.size(1), -1)
             z = torch.where(mask.unsqueeze(-1), mask_token, z)
-        z = self.positional(z)
-        return self.encoder(z)
+        if not self.hierarchical_patching:
+            z = self.positional(z)
+            return self.encoder(z)
+
+        return self._hierarchical_encode(z)
+
+    def _hierarchical_encode(self, tokens: torch.Tensor) -> torch.Tensor:
+        outputs: list[torch.Tensor] = []
+        current = self.encoders[0](self.positional(tokens))
+        outputs.append(current)
+
+        for level, merge_layer in enumerate(self.merge_layers, start=1):
+            current = self._merge_patch_tokens(current, merge_layer)
+            current = self.encoders[level](self.positional(current))
+            outputs.append(current)
+
+        fused = outputs[0]
+        scale = self.hierarchical_merge_factor
+        for level, coarse in enumerate(outputs[1:], start=1):
+            repeat = scale ** level
+            upsampled = coarse.repeat_interleave(repeat, dim=1)[:, : self.num_patches]
+            fused = fused + upsampled
+
+        return self.fusion_norm(fused / len(outputs))
+
+    def _merge_patch_tokens(self, tokens: torch.Tensor, merge_layer: nn.Linear) -> torch.Tensor:
+        batch_size, num_tokens, dim = tokens.shape
+        remainder = num_tokens % self.hierarchical_merge_factor
+        if remainder != 0:
+            pad_count = self.hierarchical_merge_factor - remainder
+            pad_tokens = tokens[:, -1:, :].expand(batch_size, pad_count, dim)
+            tokens = torch.cat([tokens, pad_tokens], dim=1)
+
+        merged = tokens.reshape(batch_size, -1, self.hierarchical_merge_factor * dim)
+        return merge_layer(merged)
 
     def _random_patch_mask(self, batch_size: int, mask_ratio: float, device: torch.device) -> torch.Tensor:
         mask = torch.rand(batch_size, self.num_patches, device=device) < mask_ratio
