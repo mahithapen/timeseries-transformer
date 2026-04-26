@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 @dataclass
 class PatchTSTConfig:
@@ -20,6 +21,7 @@ class PatchTSTConfig:
     n_layers: int = 3
     d_ff: int = 256
     dropout: float = 0.1
+    attn_dropout: float = 0.0
     fc_dropout: float = 0.1
     head_dropout: float = 0.0
     use_instance_norm: bool = True
@@ -29,16 +31,79 @@ class PatchTSTConfig:
     padding_patch: str | None = "end"
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, d_model: int, max_len: int = 5000):
+    def __init__(self, d_model: int, max_len: int = 5000, learnable: bool = True):
         super().__init__()
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        self.register_buffer('pe', pe.unsqueeze(0))
+        if learnable:
+            self.pe = nn.Parameter(torch.zeros(1, max_len, d_model))
+            nn.init.uniform_(self.pe, -0.02, 0.02)
+        else:
+            pe = torch.zeros(max_len, d_model)
+            position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+            div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+            pe[:, 0::2] = torch.sin(position * div_term)
+            pe[:, 1::2] = torch.cos(position * div_term)
+            self.register_buffer("pe", pe.unsqueeze(0))
+
     def forward(self, x):
         return x + self.pe[:, :x.size(1), :]
+
+
+class BatchNorm1dTokens(nn.Module):
+    def __init__(self, d_model: int) -> None:
+        super().__init__()
+        self.norm = nn.BatchNorm1d(d_model)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.norm(x.transpose(1, 2)).transpose(1, 2)
+
+
+class PatchTSTEncoderLayer(nn.Module):
+    def __init__(self, d_model: int, n_heads: int, d_ff: int, dropout: float, attn_dropout: float) -> None:
+        super().__init__()
+        self.self_attn = nn.MultiheadAttention(
+            embed_dim=d_model,
+            num_heads=n_heads,
+            dropout=attn_dropout,
+            batch_first=True,
+        )
+        self.dropout_attn = nn.Dropout(dropout)
+        self.norm_attn = BatchNorm1dTokens(d_model)
+
+        self.ff = nn.Sequential(
+            nn.Linear(d_model, d_ff),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(d_ff, d_model),
+        )
+        self.dropout_ffn = nn.Dropout(dropout)
+        self.norm_ffn = BatchNorm1dTokens(d_model)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        attn_out, _ = self.self_attn(x, x, x, need_weights=False)
+        x = self.norm_attn(x + self.dropout_attn(attn_out))
+        ff_out = self.ff(x)
+        x = self.norm_ffn(x + self.dropout_ffn(ff_out))
+        return x
+
+
+class PatchTSTEncoder(nn.Module):
+    def __init__(self, d_model: int, n_heads: int, d_ff: int, n_layers: int, dropout: float, attn_dropout: float) -> None:
+        super().__init__()
+        self.layers = nn.ModuleList(
+            PatchTSTEncoderLayer(
+                d_model=d_model,
+                n_heads=n_heads,
+                d_ff=d_ff,
+                dropout=dropout,
+                attn_dropout=attn_dropout,
+            )
+            for _ in range(n_layers)
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        for layer in self.layers:
+            x = layer(x)
+        return x
 
 class RevIN(nn.Module):
     def __init__(self, num_features: int, eps=1e-5, affine=True):
@@ -82,7 +147,8 @@ class PatchTST(nn.Module):
             self.num_patches += 1
         
         self.patch_embed = nn.Linear(config.patch_len, config.d_model)
-        self.positional = PositionalEncoding(config.d_model)
+        self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches, learnable=True)
+        self.input_dropout = nn.Dropout(config.dropout)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, config.d_model))
         if self.hierarchical_patching:
             self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
@@ -105,15 +171,14 @@ class PatchTST(nn.Module):
         self.reconstruction_head = nn.Linear(config.d_model, config.patch_len)
 
     def _build_encoder(self) -> nn.TransformerEncoder:
-        encoder_layer = nn.TransformerEncoderLayer(
+        return PatchTSTEncoder(
             d_model=self.config.d_model,
-            nhead=self.config.n_heads,
-            dim_feedforward=self.config.d_ff,
+            n_heads=self.config.n_heads,
+            d_ff=self.config.d_ff,
+            n_layers=self.config.n_layers,
             dropout=self.config.dropout,
-            activation="gelu",
-            batch_first=True,
+            attn_dropout=self.config.attn_dropout,
         )
-        return nn.TransformerEncoder(encoder_layer, num_layers=self.config.n_layers)
 
     def _patchify(self, x: torch.Tensor) -> torch.Tensor:
         bsz, seq_len, channels = x.shape
@@ -128,19 +193,19 @@ class PatchTST(nn.Module):
             mask_token = self.mask_token.expand(z.size(0), z.size(1), -1)
             z = torch.where(mask.unsqueeze(-1), mask_token, z)
         if not self.hierarchical_patching:
-            z = self.positional(z)
+            z = self.input_dropout(self.positional(z))
             return self.encoder(z)
 
         return self._hierarchical_encode(z)
 
     def _hierarchical_encode(self, tokens: torch.Tensor) -> torch.Tensor:
         outputs: list[torch.Tensor] = []
-        current = self.encoders[0](self.positional(tokens))
+        current = self.encoders[0](self.input_dropout(self.positional(tokens)))
         outputs.append(current)
 
         for level, merge_layer in enumerate(self.merge_layers, start=1):
             current = self._merge_patch_tokens(current, merge_layer)
-            current = self.encoders[level](self.positional(current))
+            current = self.encoders[level](self.input_dropout(self.positional(current)))
             outputs.append(current)
 
         fused = outputs[0]

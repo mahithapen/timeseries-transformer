@@ -124,43 +124,6 @@ def _compute_split_borders(
     return border1s, border2s
 
 
-def _compute_ett_split_borders(data_path: str | Path, seq_len: int) -> tuple[list[int], list[int]] | None:
-    stem = Path(data_path).stem.lower()
-    if stem.startswith("etth"):
-        train_end = 12 * 30 * 24
-        val_end = train_end + 4 * 30 * 24
-        test_end = val_end + 4 * 30 * 24
-    elif stem.startswith("ettm"):
-        train_end = 12 * 30 * 24 * 4
-        val_end = train_end + 4 * 30 * 24 * 4
-        test_end = val_end + 4 * 30 * 24 * 4
-    else:
-        return None
-
-    border1s = [0, train_end - seq_len, val_end - seq_len]
-    border2s = [train_end, val_end, test_end]
-    return border1s, border2s
-
-
-def _resolve_split_borders(
-    data_path: str | Path,
-    length: int,
-    seq_len: int,
-    val_ratio: float,
-    test_ratio: float,
-) -> tuple[list[int], list[int]]:
-    ett_borders = _compute_ett_split_borders(data_path, seq_len)
-    if ett_borders is not None:
-        border1s, border2s = ett_borders
-        if border2s[-1] > length:
-            raise ValueError(
-                f"ETT hardcoded split boundaries expect at least {border2s[-1]} timesteps, got {length}."
-            )
-        return border1s, border2s
-
-    return _compute_split_borders(length, seq_len, val_ratio, test_ratio)
-
-
 def build_datasets(
     data_path: str | Path,
     seq_len: int,
@@ -171,13 +134,7 @@ def build_datasets(
 ) -> DatasetBundle:
     series = load_time_series(data_path)
     total_length = len(series)
-    border1s, border2s = _resolve_split_borders(
-        data_path=data_path,
-        length=total_length,
-        seq_len=seq_len,
-        val_ratio=val_ratio,
-        test_ratio=test_ratio,
-    )
+    border1s, border2s = _compute_split_borders(total_length, seq_len, val_ratio, test_ratio)
     train_start, val_start, test_start = border1s
     train_end, val_end, test_end = border2s
 
@@ -234,13 +191,7 @@ def build_pretrain_dataset(
     scale: bool = True,
 ) -> tuple[ContextWindowDataset, int]:
     series = load_time_series(data_path)
-    border1s, border2s = _resolve_split_borders(
-        data_path=data_path,
-        length=len(series),
-        seq_len=seq_len,
-        val_ratio=val_ratio,
-        test_ratio=test_ratio,
-    )
+    border1s, border2s = _compute_split_borders(len(series), seq_len, val_ratio, test_ratio)
     train_start = border1s[0]
     train_end = border2s[0]
 
