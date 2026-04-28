@@ -326,6 +326,7 @@ def main() -> None:
         )
         pretrain_loader = DataLoader(pretrain_dataset, batch_size=args.batch_size, shuffle=True)
         model = PatchTST(config, in_channels=in_channels).to(args.device)
+        model = torch.compile(model)
 
         print(f"Starting masked-patch pretraining for {args.pretrain_epochs} epochs...")
         run_pretraining(
@@ -367,6 +368,7 @@ def main() -> None:
     train_loader = DataLoader(bundle.train, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(bundle.val, batch_size=args.batch_size, shuffle=False)
     model = PatchTST(config, in_channels=bundle.in_channels).to(args.device)
+    model = torch.compile(model)
 
     loaded_pretrain_metadata: dict[str, Any] | None = None
     if pretrained_checkpoint_path is not None:
