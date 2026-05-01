@@ -108,8 +108,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
     )
-
-    # NEW RESUME FLAG
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -235,11 +233,16 @@ def load_pretrained_backbone(
 ) -> dict[str, Any]:
     checkpoint = torch.load(checkpoint_path, map_location=device)
     pretrained_state = checkpoint["model_state_dict"]
+
+    # STRIP COMPILE PREFIX FOR PRETRAINED LOAD
+    clean_state_dict = {
+        k.replace("_orig_mod.", ""): v for k, v in pretrained_state.items()
+    }
     current_state = model.state_dict()
 
     filtered_state: dict[str, torch.Tensor] = {}
     skipped: list[str] = []
-    for name, tensor in pretrained_state.items():
+    for name, tensor in clean_state_dict.items():
         if name.startswith("forecast_head"):
             skipped.append(name)
             continue
@@ -252,14 +255,9 @@ def load_pretrained_backbone(
     print(f"Loaded pretrained backbone from {checkpoint_path}")
     if skipped:
         print(f"Skipped {len(skipped)} parameter(s) due to head or shape mismatch.")
-    if missing:
-        print(f"Missing parameters after load: {len(missing)}")
-    if unexpected:
-        print(f"Unexpected parameters after load: {len(unexpected)}")
     return checkpoint
 
 
-# UPDATED: Added optimizer to checkpoint saves
 def save_checkpoint(
     checkpoint_path: Path,
     model: torch.nn.Module,
@@ -294,7 +292,7 @@ def run_supervised_phase(
     metadata: dict[str, Any],
     phase_name: str,
     best_val_loss: float,
-    resume: bool = False,  # NEW
+    resume: bool = False,
 ) -> float:
     if epochs <= 0:
         return best_val_loss
@@ -308,11 +306,17 @@ def run_supervised_phase(
 
     start_epoch = 0
 
-    # NEW: Logic to resume from checkpoint
     if resume and checkpoint_path.exists():
         print(f"Resuming {phase_name} from checkpoint: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path, map_location=device)
-        model.load_state_dict(checkpoint["model_state_dict"])
+
+        # STRIP COMPILE PREFIX FIX
+        state_dict = checkpoint["model_state_dict"]
+        clean_state_dict = {
+            k.replace("_orig_mod.", ""): v for k, v in state_dict.items()
+        }
+        model.load_state_dict(clean_state_dict)
+
         if "optimizer_state_dict" in checkpoint:
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
@@ -363,7 +367,6 @@ def run_supervised_phase(
             metadata["epoch"] = epoch
             metadata["num_bad_epochs"] = stopper.num_bad_epochs if stopper else 0
 
-            # Pass optimizer so it saves the state
             save_checkpoint(checkpoint_path, model, config_dict, metadata, optimizer)
             print(f"Saved checkpoint to {checkpoint_path}")
 
@@ -385,9 +388,6 @@ def main() -> None:
     checkpoint_path = Path(args.checkpoint)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # ---------------------------------------------------------
-    # Route: DLinear Logic
-    # ---------------------------------------------------------
     if args.model_type == "dlinear":
         if (
             args.pretrain_only
@@ -449,9 +449,6 @@ def main() -> None:
         )
         return
 
-    # ---------------------------------------------------------
-    # Route: PatchTST Logic (Original)
-    # ---------------------------------------------------------
     config = build_config(args)
     config_dict = asdict(config)
     config_dict["model_type"] = "patchtst"
