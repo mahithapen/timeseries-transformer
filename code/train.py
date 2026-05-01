@@ -234,11 +234,13 @@ def load_pretrained_backbone(
     checkpoint = torch.load(checkpoint_path, map_location=device)
     pretrained_state = checkpoint["model_state_dict"]
 
-    # STRIP COMPILE PREFIX FOR PRETRAINED LOAD
     clean_state_dict = {
         k.replace("_orig_mod.", ""): v for k, v in pretrained_state.items()
     }
-    current_state = model.state_dict()
+
+    # Extract uncompiled base model to avoid prefix issues
+    base_model = getattr(model, "_orig_mod", model)
+    current_state = base_model.state_dict()
 
     filtered_state: dict[str, torch.Tensor] = {}
     skipped: list[str] = []
@@ -251,7 +253,7 @@ def load_pretrained_backbone(
         else:
             skipped.append(name)
 
-    missing, unexpected = model.load_state_dict(filtered_state, strict=False)
+    missing, unexpected = base_model.load_state_dict(filtered_state, strict=False)
     print(f"Loaded pretrained backbone from {checkpoint_path}")
     if skipped:
         print(f"Skipped {len(skipped)} parameter(s) due to head or shape mismatch.")
@@ -310,12 +312,14 @@ def run_supervised_phase(
         print(f"Resuming {phase_name} from checkpoint: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path, map_location=device)
 
-        # STRIP COMPILE PREFIX FIX
         state_dict = checkpoint["model_state_dict"]
         clean_state_dict = {
             k.replace("_orig_mod.", ""): v for k, v in state_dict.items()
         }
-        model.load_state_dict(clean_state_dict)
+
+        # EXPLICIT FIX: Load into base uncompiled module
+        base_model = getattr(model, "_orig_mod", model)
+        base_model.load_state_dict(clean_state_dict)
 
         if "optimizer_state_dict" in checkpoint:
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
