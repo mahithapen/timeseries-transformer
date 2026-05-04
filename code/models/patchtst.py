@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 @dataclass
 class PatchTSTConfig:
@@ -16,6 +15,9 @@ class PatchTSTConfig:
     hierarchical_patching: bool = False
     hierarchical_levels: int = 2
     hierarchical_merge_factor: int = 2
+    # Mutually exclusive with hierarchical_patching: pyramid uses window attention (+ alternating shift).
+    swin_like_patching: bool = False
+    swin_window_size: int = 8
     d_model: int = 128
     n_heads: int = 4
     n_layers: int = 3
@@ -105,6 +107,118 @@ class PatchTSTEncoder(nn.Module):
             x = layer(x)
         return x
 
+
+class WindowAttention1D(nn.Module):
+    """Self-attention independently within each 1D patch-token window (batch_first)."""
+
+    def __init__(self, d_model: int, n_heads: int, attn_dropout: float) -> None:
+        super().__init__()
+        self.attn = nn.MultiheadAttention(
+            embed_dim=d_model,
+            num_heads=n_heads,
+            dropout=attn_dropout,
+            batch_first=True,
+        )
+
+    def forward(self, x: torch.Tensor, window_size: int, shift_size: int) -> torch.Tensor:
+        if window_size <= 0:
+            raise ValueError("window_size must be positive")
+        batch_size, seq_len, _ = x.shape
+        if seq_len % window_size != 0:
+            raise RuntimeError(f"seq_len {seq_len} not divisible by window_size {window_size}")
+        if shift_size:
+            x = torch.roll(x, shifts=-shift_size, dims=1)
+        num_windows = seq_len // window_size
+        xw = x.reshape(batch_size, num_windows, window_size, x.size(-1)).reshape(
+            batch_size * num_windows, window_size, x.size(-1)
+        )
+        out, _ = self.attn(xw, xw, xw, need_weights=False)
+        x = out.reshape(batch_size, num_windows * window_size, x.size(-1))
+        if shift_size:
+            x = torch.roll(x, shifts=shift_size, dims=1)
+        return x
+
+
+class SwinEncoderLayer1D(nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        n_heads: int,
+        d_ff: int,
+        dropout: float,
+        attn_dropout: float,
+        shift_size: int,
+    ) -> None:
+        super().__init__()
+        self.shift_size = shift_size
+        self.window_attn = WindowAttention1D(d_model, n_heads, attn_dropout)
+        self.dropout_attn = nn.Dropout(dropout)
+        self.norm_attn = BatchNorm1dTokens(d_model)
+        self.ff = nn.Sequential(
+            nn.Linear(d_model, d_ff),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(d_ff, d_model),
+        )
+        self.dropout_ffn = nn.Dropout(dropout)
+        self.norm_ffn = BatchNorm1dTokens(d_model)
+
+    def forward(self, x: torch.Tensor, window_size: int) -> torch.Tensor:
+        shift = self.shift_size if window_size > 1 else 0
+        if shift and shift >= window_size:
+            shift = shift % window_size
+        attn_out = self.window_attn(x, window_size, shift)
+        x = self.norm_attn(x + self.dropout_attn(attn_out))
+        ff_out = self.ff(x)
+        x = self.norm_ffn(x + self.dropout_ffn(ff_out))
+        return x
+
+
+class SwinTransformerStage1D(nn.Module):
+    """Swin-style stack on patch-token sequences: window attention with alternating cyclic shift along time."""
+
+    def __init__(
+        self,
+        d_model: int,
+        n_heads: int,
+        d_ff: int,
+        n_layers: int,
+        window_size: int,
+        dropout: float,
+        attn_dropout: float,
+    ) -> None:
+        super().__init__()
+        self.window_size_cfg = max(1, window_size)
+        base_shift = self.window_size_cfg // 2
+        self.blocks = nn.ModuleList()
+        for layer_index in range(n_layers):
+            use_shift = base_shift > 0 and (layer_index % 2 == 1)
+            self.blocks.append(
+                SwinEncoderLayer1D(
+                    d_model=d_model,
+                    n_heads=n_heads,
+                    d_ff=d_ff,
+                    dropout=dropout,
+                    attn_dropout=attn_dropout,
+                    shift_size=base_shift if use_shift else 0,
+                )
+            )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, seq_orig, dim = x.shape
+        if seq_orig == 0:
+            return x
+        ws = min(self.window_size_cfg, seq_orig)
+        ws = max(ws, 1)
+        pad_len = (ws - seq_orig % ws) % ws
+        if pad_len:
+            pad = x[:, -1:, :].expand(batch_size, pad_len, dim)
+            x = torch.cat([x, pad], dim=1)
+        for block in self.blocks:
+            x = block(x, window_size=ws)
+        return x[:, :seq_orig, :]
+
+
 class RevIN(nn.Module):
     def __init__(self, num_features: int, eps=1e-5, affine=True):
         super(RevIN, self).__init__()
@@ -135,6 +249,9 @@ class PatchTST(nn.Module):
         self.in_channels = in_channels
         self.revin = RevIN(in_channels, affine=config.revin_affine) if config.use_instance_norm else None
         self.hierarchical_patching = config.hierarchical_patching
+        self.swin_like_patching = config.swin_like_patching
+        if self.hierarchical_patching and self.swin_like_patching:
+            raise ValueError("Use at most one of hierarchical_patching and swin_like_patching.")
         self.hierarchical_levels = max(1, config.hierarchical_levels)
         self.hierarchical_merge_factor = config.hierarchical_merge_factor
         if self.hierarchical_merge_factor < 2:
@@ -150,8 +267,11 @@ class PatchTST(nn.Module):
         self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches, learnable=True)
         self.input_dropout = nn.Dropout(config.dropout)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, config.d_model))
-        if self.hierarchical_patching:
-            self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
+        if self.hierarchical_patching or self.swin_like_patching:
+            if self.swin_like_patching:
+                self.encoders = nn.ModuleList(self._build_swin_stage() for _ in range(self.hierarchical_levels))
+            else:
+                self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
             self.merge_layers = nn.ModuleList(
                 nn.Linear(config.d_model * self.hierarchical_merge_factor, config.d_model)
                 for _ in range(self.hierarchical_levels - 1)
@@ -170,12 +290,23 @@ class PatchTST(nn.Module):
         )
         self.reconstruction_head = nn.Linear(config.d_model, config.patch_len)
 
-    def _build_encoder(self) -> nn.TransformerEncoder:
+    def _build_encoder(self) -> PatchTSTEncoder:
         return PatchTSTEncoder(
             d_model=self.config.d_model,
             n_heads=self.config.n_heads,
             d_ff=self.config.d_ff,
             n_layers=self.config.n_layers,
+            dropout=self.config.dropout,
+            attn_dropout=self.config.attn_dropout,
+        )
+
+    def _build_swin_stage(self) -> SwinTransformerStage1D:
+        return SwinTransformerStage1D(
+            d_model=self.config.d_model,
+            n_heads=self.config.n_heads,
+            d_ff=self.config.d_ff,
+            n_layers=self.config.n_layers,
+            window_size=self.config.swin_window_size,
             dropout=self.config.dropout,
             attn_dropout=self.config.attn_dropout,
         )
@@ -192,13 +323,13 @@ class PatchTST(nn.Module):
         if mask is not None:
             mask_token = self.mask_token.expand(z.size(0), z.size(1), -1)
             z = torch.where(mask.unsqueeze(-1), mask_token, z)
-        if not self.hierarchical_patching:
+        if not self.hierarchical_patching and not self.swin_like_patching:
             z = self.input_dropout(self.positional(z))
             return self.encoder(z)
 
-        return self._hierarchical_encode(z)
+        return self._pyramid_encode(z)
 
-    def _hierarchical_encode(self, tokens: torch.Tensor) -> torch.Tensor:
+    def _pyramid_encode(self, tokens: torch.Tensor) -> torch.Tensor:
         outputs: list[torch.Tensor] = []
         current = self.encoders[0](self.input_dropout(self.positional(tokens)))
         outputs.append(current)

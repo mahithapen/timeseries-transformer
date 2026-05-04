@@ -30,13 +30,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pred-len", type=int, default=96)
     parser.add_argument("--patch-len", type=int, default=16)
     parser.add_argument("--stride", type=int, default=8)
-    parser.add_argument(
+    pyramid_group = parser.add_mutually_exclusive_group()
+    pyramid_group.add_argument(
         "--hierarchical-patching",
         action="store_true",
-        help="Enable multi-scale hierarchical patching with progressive token merging.",
+        help="Multi-scale pyramid: full attention per stage + merge + fuse back to patch grid.",
+    )
+    pyramid_group.add_argument(
+        "--swin-like-patching",
+        action="store_true",
+        help="Same pyramid as hierarchical, but each stage uses window attention + alternating cyclic shift (Swin-like 1D).",
     )
     parser.add_argument("--hierarchical-levels", type=int, default=2)
     parser.add_argument("--hierarchical-merge-factor", type=int, default=2)
+    parser.add_argument(
+        "--swin-window-size",
+        type=int,
+        default=8,
+        help="Patch-token window size for --swin-like-patching (clamped per stage to sequence length).",
+    )
     parser.add_argument("--d-model", type=int, default=128)
     parser.add_argument("--n-heads", type=int, default=4)
     parser.add_argument("--n-layers", type=int, default=3)
@@ -124,8 +136,10 @@ def build_config(args: argparse.Namespace) -> PatchTSTConfig:
         patch_len=args.patch_len,
         stride=args.stride,
         hierarchical_patching=args.hierarchical_patching,
+        swin_like_patching=args.swin_like_patching,
         hierarchical_levels=args.hierarchical_levels,
         hierarchical_merge_factor=args.hierarchical_merge_factor,
+        swin_window_size=args.swin_window_size,
         d_model=args.d_model,
         n_heads=args.n_heads,
         n_layers=args.n_layers,
