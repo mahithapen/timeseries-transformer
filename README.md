@@ -6,7 +6,7 @@
 This repository contains our CS 4782 final project re-implementation of **"A Time Series is Worth 64 Words: Long-Term Forecasting with Transformers"** (ICLR 2023). The paper introduces **PatchTST**, a transformer architecture that improves long-term time series forecasting via patching and channel independence, enabling longer look-back windows with lower compute.
 
 ## Chosen Result
-We aim to reproduce the **supervised and self-supervised** results reported in **Tables 3 and 4** of the paper on the **Electricity, Traffic, and Weather** datasets. These results highlight PatchTST's performance gains over prior baselines for long-term forecasting and representation learning.
+We run supervised forecasting experiments on the **Electricity, Traffic, Weather, and Ithaca Weather** datasets, comparing DLinear with PatchTST/42 and PatchTST/64 style variants.
 
 ## GitHub Contents
 - `code/`: Re-implementation code and configs
@@ -21,8 +21,7 @@ We aim to reproduce the **supervised and self-supervised** results reported in *
 - **Key ideas:** channel independence, instance normalization, patching (length `P`, stride `S`), learnable positional encodings, transformer encoder, MLP head
 - **Tasks:**
   - Supervised forecasting (MSE/MAE)
-  - Self-supervised reconstruction with 40% patch masking
-- **Resource-aware changes:** reduce attention heads (16 -> 4) and training epochs (100 -> 20)
+- **Current recipe:** prediction length 96, 16 attention heads, and 100 supervised epochs
 
 ## Reproduction Steps
 1. Create and activate a Python environment
