@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 @dataclass
 class PatchTSTConfig:
@@ -17,17 +16,15 @@ class PatchTSTConfig:
     hierarchical_levels: int = 2
     hierarchical_merge_factor: int = 2
     d_model: int = 128
-    n_heads: int = 4
+    n_heads: int = 16
     n_layers: int = 3
     d_ff: int = 256
-    dropout: float = 0.1
+    dropout: float = 0.2
     attn_dropout: float = 0.0
-    fc_dropout: float = 0.1
+    fc_dropout: float = 0.2
     head_dropout: float = 0.0
     use_instance_norm: bool = True
     revin_affine: bool = False
-    task: str = "forecast"
-    mask_ratio: float = 0.4
     padding_patch: str | None = "end"
 
 class PositionalEncoding(nn.Module):
@@ -149,7 +146,6 @@ class PatchTST(nn.Module):
         self.patch_embed = nn.Linear(config.patch_len, config.d_model)
         self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches, learnable=True)
         self.input_dropout = nn.Dropout(config.dropout)
-        self.mask_token = nn.Parameter(torch.zeros(1, 1, config.d_model))
         if self.hierarchical_patching:
             self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
             self.merge_layers = nn.ModuleList(
@@ -168,7 +164,6 @@ class PatchTST(nn.Module):
             nn.Linear(config.d_model * self.num_patches, config.pred_len),
             nn.Dropout(config.head_dropout),
         )
-        self.reconstruction_head = nn.Linear(config.d_model, config.patch_len)
 
     def _build_encoder(self) -> nn.TransformerEncoder:
         return PatchTSTEncoder(
@@ -187,15 +182,11 @@ class PatchTST(nn.Module):
             x = self.pad_layer(x)
         return x.unfold(dimension=-1, size=self.config.patch_len, step=self.config.stride)
 
-    def _encode_patches(self, patches: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+    def _encode_patches(self, patches: torch.Tensor) -> torch.Tensor:
         z = self.patch_embed(patches)
-        if mask is not None:
-            mask_token = self.mask_token.expand(z.size(0), z.size(1), -1)
-            z = torch.where(mask.unsqueeze(-1), mask_token, z)
         if not self.hierarchical_patching:
             z = self.input_dropout(self.positional(z))
             return self.encoder(z)
-
         return self._hierarchical_encode(z)
 
     def _hierarchical_encode(self, tokens: torch.Tensor) -> torch.Tensor:
@@ -227,38 +218,6 @@ class PatchTST(nn.Module):
 
         merged = tokens.reshape(batch_size, -1, self.hierarchical_merge_factor * dim)
         return merge_layer(merged)
-
-    def _random_patch_mask(self, batch_size: int, mask_ratio: float, device: torch.device) -> torch.Tensor:
-        mask = torch.rand(batch_size, self.num_patches, device=device) < mask_ratio
-        empty_rows = mask.sum(dim=1) == 0
-        if empty_rows.any():
-            random_index = torch.randint(self.num_patches, (int(empty_rows.sum().item()),), device=device)
-            mask[empty_rows, random_index] = True
-        return mask
-
-    def forward_pretrain(
-        self,
-        x: torch.Tensor,
-        mask_ratio: float | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        if self.revin:
-            x = self.revin(x, 'norm')
-
-        patches = self._patchify(x)
-        mask = self._random_patch_mask(
-            batch_size=patches.size(0),
-            mask_ratio=self.config.mask_ratio if mask_ratio is None else mask_ratio,
-            device=patches.device,
-        )
-        encoded = self._encode_patches(patches, mask=mask)
-        reconstructed = self.reconstruction_head(encoded)
-
-        bsz = x.size(0)
-        channels = x.size(2)
-        reconstructed = reconstructed.reshape(bsz, channels, self.num_patches, self.config.patch_len)
-        target = patches.reshape(bsz, channels, self.num_patches, self.config.patch_len)
-        mask = mask.reshape(bsz, channels, self.num_patches)
-        return reconstructed, target, mask
 
     def forward(self, x: torch.Tensor):
         if self.revin:

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import fields
 
 import torch
 from torch.utils.data import DataLoader
 
 from data.window_dataset import build_datasets
+from models.dlinear import DLinear
 from models.patchtst import PatchTST, PatchTSTConfig
 
 
@@ -19,16 +21,34 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def build_model(checkpoint: dict, device: str) -> torch.nn.Module:
+    config = checkpoint["config"]
+    model_type = config.get("model_type", "patchtst")
+
+    if model_type == "dlinear":
+        return DLinear(
+            seq_len=config["seq_len"],
+            pred_len=config["pred_len"],
+            channels=checkpoint["in_channels"],
+        ).to(device)
+
+    config_fields = {field.name for field in fields(PatchTSTConfig)}
+    patchtst_config = PatchTSTConfig(
+        **{key: value for key, value in config.items() if key in config_fields}
+    )
+    return PatchTST(patchtst_config, in_channels=checkpoint["in_channels"]).to(device)
+
+
 def main() -> None:
     args = parse_args()
     checkpoint = torch.load(args.checkpoint, map_location=args.device)
-    config = PatchTSTConfig(**checkpoint["config"])
+    config = checkpoint["config"]
     data_path = args.data or checkpoint["data_path"]
 
     bundle = build_datasets(
         data_path=data_path,
-        seq_len=config.seq_len,
-        pred_len=config.pred_len,
+        seq_len=config["seq_len"],
+        pred_len=config["pred_len"],
         val_ratio=checkpoint["val_ratio"],
         test_ratio=checkpoint["test_ratio"],
         scale=checkpoint["scale"],
@@ -37,8 +57,12 @@ def main() -> None:
     dataset = bundle.val if args.split == "val" else bundle.test
     loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
-    model = PatchTST(config, in_channels=checkpoint["in_channels"]).to(args.device)
-    model.load_state_dict(checkpoint["model_state_dict"])
+    model = build_model(checkpoint, args.device)
+    state_dict = {
+        key.replace("_orig_mod.", ""): value
+        for key, value in checkpoint["model_state_dict"].items()
+    }
+    model.load_state_dict(state_dict)
     model.eval()
 
     mae = torch.nn.L1Loss()

@@ -8,9 +8,9 @@ from typing import Any
 import torch
 from torch.utils.data import DataLoader
 
-from data.window_dataset import build_datasets, build_pretrain_dataset
-from models.patchtst import PatchTST, PatchTSTConfig
+from data.window_dataset import build_datasets
 from models.dlinear import DLinear
+from models.patchtst import PatchTST, PatchTSTConfig
 from utils.seed import set_seed
 
 
@@ -23,9 +23,7 @@ def parse_args() -> argparse.Namespace:
         default="patchtst",
         help="Model architecture to train",
     )
-    parser.add_argument(
-        "--data", type=str, required=True, help="Path to a .csv, .npy, or .npz series"
-    )
+    parser.add_argument("--data", type=str, required=True, help="Path to a .csv, .npy, or .npz series")
     parser.add_argument("--seq-len", type=int, default=336)
     parser.add_argument("--pred-len", type=int, default=96)
     parser.add_argument("--patch-len", type=int, default=16)
@@ -38,32 +36,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hierarchical-levels", type=int, default=2)
     parser.add_argument("--hierarchical-merge-factor", type=int, default=2)
     parser.add_argument("--d-model", type=int, default=128)
-    parser.add_argument("--n-heads", type=int, default=4)
+    parser.add_argument("--n-heads", type=int, default=16)
     parser.add_argument("--n-layers", type=int, default=3)
     parser.add_argument("--d-ff", type=int, default=256)
-    parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--attn-dropout", type=float, default=0.0)
-    parser.add_argument("--fc-dropout", type=float, default=0.1)
+    parser.add_argument("--fc-dropout", type=float, default=0.2)
     parser.add_argument("--head-dropout", type=float, default=0.0)
     parser.add_argument(
         "--padding-patch",
         type=str,
         choices=["end", "none"],
         default="end",
-        help="Patch padding strategy. Use 'end' to match the paper's extra trailing patch.",
+        help="Patch padding strategy. DLinear ignores this option.",
     )
-    parser.add_argument(
-        "--epochs", type=int, default=100, help="Supervised epochs from scratch"
-    )
-    parser.add_argument("--pretrain-epochs", type=int, default=0)
-    parser.add_argument("--pretrain-mask-ratio", type=float, default=0.4)
-    parser.add_argument("--linear-probe-epochs", type=int, default=0)
-    parser.add_argument("--finetune-epochs", type=int, default=0)
+    parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-4)
-    parser.add_argument("--pretrain-lr", type=float, default=1e-4)
-    parser.add_argument("--probe-lr", type=float, default=1e-4)
-    parser.add_argument("--finetune-lr", type=float, default=1e-4)
     parser.add_argument(
         "--patience",
         type=int,
@@ -84,40 +73,29 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--val-ratio", type=float, default=0.1)
     parser.add_argument("--test-ratio", type=float, default=0.2)
-    parser.add_argument(
-        "--no-scale", action="store_true", help="Disable train-split normalization"
-    )
+    parser.add_argument("--no-scale", action="store_true", help="Disable train-split normalization")
     parser.add_argument(
         "--revin-affine",
         action="store_true",
-        help="Enable affine parameters in RevIN. Disabled by default to better match the paper recipe.",
-    )
-    parser.add_argument(
-        "--pretrain-only",
-        action="store_true",
-        help="Run masked patch pretraining only and save a pretrained checkpoint.",
-    )
-    parser.add_argument(
-        "--pretrained-checkpoint",
-        type=str,
-        default="",
-        help="Optional pretrained checkpoint to initialize the encoder before downstream training.",
+        help="Enable affine parameters in RevIN.",
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--checkpoint", type=str, default="checkpoints/model_best.pt")
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument(
-        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+        "--compile",
+        action="store_true",
+        help="Compile the model with torch.compile before training.",
     )
     parser.add_argument(
         "--resume",
         action="store_true",
         help="Resume training mid-run from the checkpoint.",
     )
-
     return parser.parse_args()
 
 
-def build_config(args: argparse.Namespace) -> PatchTSTConfig:
+def build_patchtst_config(args: argparse.Namespace) -> PatchTSTConfig:
     return PatchTSTConfig(
         seq_len=args.seq_len,
         pred_len=args.pred_len,
@@ -134,11 +112,13 @@ def build_config(args: argparse.Namespace) -> PatchTSTConfig:
         attn_dropout=args.attn_dropout,
         fc_dropout=args.fc_dropout,
         head_dropout=args.head_dropout,
-        task="forecast",
-        mask_ratio=args.pretrain_mask_ratio,
         revin_affine=args.revin_affine,
         padding_patch=None if args.padding_patch == "none" else args.padding_patch,
     )
+
+
+def base_model(model: torch.nn.Module) -> torch.nn.Module:
+    return getattr(model, "_orig_mod", model)
 
 
 def evaluate_forecast(
@@ -148,10 +128,8 @@ def evaluate_forecast(
     total_loss = 0.0
     with torch.no_grad():
         for x, y in loader:
-            x = x.to(device)
-            y = y.to(device)
-            pred = model(x)
-            total_loss += criterion(pred, y).item()
+            pred = model(x.to(device))
+            total_loss += criterion(pred, y.to(device)).item()
     return total_loss / max(1, len(loader))
 
 
@@ -185,81 +163,6 @@ def adjust_learning_rate(
     return lr
 
 
-def run_pretraining(
-    model: PatchTST,
-    loader: DataLoader,
-    epochs: int,
-    device: str,
-    lr: float,
-    mask_ratio: float,
-) -> None:
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    model.train()
-    for epoch in range(epochs):
-        total_loss = 0.0
-        for x in loader:
-            x = x.to(device)
-            reconstructed, target, mask = model.forward_pretrain(
-                x, mask_ratio=mask_ratio
-            )
-            squared_error = (reconstructed - target) ** 2
-            masked_error = squared_error * mask.unsqueeze(-1).float()
-            loss = masked_error.sum() / mask.sum().clamp_min(1).float()
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            total_loss += loss.item()
-
-        avg_loss = total_loss / max(1, len(loader))
-        print(f"Pretrain {epoch + 1}/{epochs} - masked patch loss: {avg_loss:.4f}")
-
-
-def freeze_for_linear_probe(model: PatchTST) -> None:
-    for parameter in model.parameters():
-        parameter.requires_grad = False
-    for parameter in model.forecast_head.parameters():
-        parameter.requires_grad = True
-
-
-def unfreeze_all(model: torch.nn.Module) -> None:
-    for parameter in model.parameters():
-        parameter.requires_grad = True
-
-
-def load_pretrained_backbone(
-    model: PatchTST, checkpoint_path: Path, device: str
-) -> dict[str, Any]:
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    pretrained_state = checkpoint["model_state_dict"]
-
-    clean_state_dict = {
-        k.replace("_orig_mod.", ""): v for k, v in pretrained_state.items()
-    }
-
-    # Extract uncompiled base model to avoid prefix issues
-    base_model = getattr(model, "_orig_mod", model)
-    current_state = base_model.state_dict()
-
-    filtered_state: dict[str, torch.Tensor] = {}
-    skipped: list[str] = []
-    for name, tensor in clean_state_dict.items():
-        if name.startswith("forecast_head"):
-            skipped.append(name)
-            continue
-        if name in current_state and current_state[name].shape == tensor.shape:
-            filtered_state[name] = tensor
-        else:
-            skipped.append(name)
-
-    missing, unexpected = base_model.load_state_dict(filtered_state, strict=False)
-    print(f"Loaded pretrained backbone from {checkpoint_path}")
-    if skipped:
-        print(f"Skipped {len(skipped)} parameter(s) due to head or shape mismatch.")
-    return checkpoint
-
-
 def save_checkpoint(
     checkpoint_path: Path,
     model: torch.nn.Module,
@@ -268,17 +171,16 @@ def save_checkpoint(
     optimizer: torch.optim.Optimizer | None = None,
 ) -> None:
     save_dict = {
-        "model_state_dict": model.state_dict(),
+        "model_state_dict": base_model(model).state_dict(),
         "config": config_dict,
         **metadata,
     }
     if optimizer is not None:
         save_dict["optimizer_state_dict"] = optimizer.state_dict()
-
     torch.save(save_dict, checkpoint_path)
 
 
-def run_supervised_phase(
+def train_forecast(
     *,
     model: torch.nn.Module,
     train_loader: DataLoader,
@@ -292,54 +194,35 @@ def run_supervised_phase(
     checkpoint_path: Path,
     config_dict: dict[str, Any],
     metadata: dict[str, Any],
-    phase_name: str,
-    best_val_loss: float,
-    resume: bool = False,
+    resume: bool,
 ) -> float:
-    if epochs <= 0:
-        return best_val_loss
-
-    trainable_parameters = [
-        parameter for parameter in model.parameters() if parameter.requires_grad
-    ]
-    optimizer = torch.optim.Adam(trainable_parameters, lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
     stopper = EarlyStopping(patience) if early_stopping_enabled else None
-
+    best_val_loss = float("inf")
     start_epoch = 0
 
     if resume and checkpoint_path.exists():
-        print(f"Resuming {phase_name} from checkpoint: {checkpoint_path}")
+        print(f"Resuming supervised training from checkpoint: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path, map_location=device)
-
-        state_dict = checkpoint["model_state_dict"]
-        clean_state_dict = {
-            k.replace("_orig_mod.", ""): v for k, v in state_dict.items()
+        state_dict = {
+            key.replace("_orig_mod.", ""): value
+            for key, value in checkpoint["model_state_dict"].items()
         }
-
-        # EXPLICIT FIX: Load into base uncompiled module
-        base_model = getattr(model, "_orig_mod", model)
-        base_model.load_state_dict(clean_state_dict)
-
+        base_model(model).load_state_dict(state_dict)
         if "optimizer_state_dict" in checkpoint:
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-
         start_epoch = checkpoint.get("epoch", 0) + 1
         best_val_loss = checkpoint.get("best_val_loss", float("inf"))
-
         if stopper is not None:
             stopper.num_bad_epochs = checkpoint.get("num_bad_epochs", 0)
             stopper.best_loss = best_val_loss
 
-        print(
-            f"Resumed successfully at epoch {start_epoch} with best val loss {best_val_loss:.4f}"
-        )
-
     if start_epoch >= epochs:
-        print(f"{phase_name} already completed up to epoch {epochs}.")
+        print(f"Supervised training already completed up to epoch {epochs}.")
         return best_val_loss
 
-    print(f"Starting {phase_name} on {device} from epoch {start_epoch} to {epochs}...")
+    print(f"Starting supervised training on {device} from epoch {start_epoch} to {epochs}...")
     for epoch in range(start_epoch, epochs):
         current_lr = adjust_learning_rate(optimizer, epoch + 1, lr, scheduler)
         model.train()
@@ -347,299 +230,102 @@ def run_supervised_phase(
         for x, y in train_loader:
             x = x.to(device)
             y = y.to(device)
-
             pred = model(x)
             loss = criterion(pred, y)
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
             total_loss += loss.item()
 
         train_loss = total_loss / max(1, len(train_loader))
         val_loss = evaluate_forecast(model, val_loader, device, criterion)
         print(
-            f"{phase_name} {epoch + 1}/{epochs} - lr: {current_lr:.6g} - "
+            f"Epoch {epoch + 1}/{epochs} - lr: {current_lr:.6g} - "
             f"train_loss: {train_loss:.4f} - val_loss: {val_loss:.4f}"
         )
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             metadata["best_val_loss"] = best_val_loss
-            metadata["last_phase"] = phase_name
             metadata["epoch"] = epoch
             metadata["num_bad_epochs"] = stopper.num_bad_epochs if stopper else 0
-
             save_checkpoint(checkpoint_path, model, config_dict, metadata, optimizer)
             print(f"Saved checkpoint to {checkpoint_path}")
 
         if stopper is not None and stopper.step(val_loss):
-            print(
-                f"Early stopping triggered during {phase_name} after {epoch + 1} epochs."
-            )
+            print(f"Early stopping triggered after {epoch + 1} epochs.")
             break
 
     return best_val_loss
+
+
+def build_model(
+    args: argparse.Namespace, in_channels: int
+) -> tuple[torch.nn.Module, dict[str, Any]]:
+    if args.model_type == "dlinear":
+        model = DLinear(seq_len=args.seq_len, pred_len=args.pred_len, channels=in_channels)
+        return model, {
+            "model_type": "dlinear",
+            "seq_len": args.seq_len,
+            "pred_len": args.pred_len,
+        }
+
+    config = build_patchtst_config(args)
+    config_dict = asdict(config)
+    config_dict["model_type"] = "patchtst"
+    return PatchTST(config, in_channels=in_channels), config_dict
 
 
 def main() -> None:
     args = parse_args()
     set_seed(args.seed)
 
-    scale = not args.no_scale
-    data_path = Path(args.data)
     checkpoint_path = Path(args.checkpoint)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
-    if args.model_type == "dlinear":
-        if (
-            args.pretrain_only
-            or args.pretrain_epochs > 0
-            or args.linear_probe_epochs > 0
-        ):
-            raise ValueError("DLinear does not support pretraining or linear probing.")
-
-        bundle = build_datasets(
-            data_path=data_path,
-            seq_len=args.seq_len,
-            pred_len=args.pred_len,
-            val_ratio=args.val_ratio,
-            test_ratio=args.test_ratio,
-            scale=scale,
-        )
-        train_loader = DataLoader(
-            bundle.train, batch_size=args.batch_size, shuffle=True
-        )
-        val_loader = DataLoader(bundle.val, batch_size=args.batch_size, shuffle=False)
-
-        model = DLinear(
-            seq_len=args.seq_len, pred_len=args.pred_len, channels=bundle.in_channels
-        ).to(args.device)
-        model = torch.compile(model)
-
-        config_dict = {
-            "model_type": "dlinear",
-            "seq_len": args.seq_len,
-            "pred_len": args.pred_len,
-        }
-        metadata: dict[str, Any] = {
-            "in_channels": bundle.in_channels,
-            "data_path": str(data_path),
-            "val_ratio": args.val_ratio,
-            "test_ratio": args.test_ratio,
-            "scale": scale,
-            "best_val_loss": float("inf"),
-            "training_stage": "supervised",
-            "seed": args.seed,
-        }
-
-        run_supervised_phase(
-            model=model,
-            train_loader=train_loader,
-            val_loader=val_loader,
-            device=args.device,
-            epochs=args.epochs,
-            lr=args.lr,
-            scheduler=args.scheduler,
-            patience=args.patience,
-            early_stopping_enabled=not args.disable_early_stopping,
-            checkpoint_path=checkpoint_path,
-            config_dict=config_dict,
-            metadata=metadata,
-            phase_name="supervised",
-            best_val_loss=float("inf"),
-            resume=args.resume,
-        )
-        return
-
-    config = build_config(args)
-    config_dict = asdict(config)
-    config_dict["model_type"] = "patchtst"
-
-    pretrained_checkpoint_path = (
-        Path(args.pretrained_checkpoint) if args.pretrained_checkpoint else None
-    )
-
-    if args.pretrain_only:
-        if args.pretrain_epochs <= 0:
-            raise ValueError("--pretrain-only requires --pretrain-epochs > 0")
-
-        pretrain_dataset, in_channels = build_pretrain_dataset(
-            data_path=data_path,
-            seq_len=args.seq_len,
-            val_ratio=args.val_ratio,
-            test_ratio=args.test_ratio,
-            scale=scale,
-        )
-        pretrain_loader = DataLoader(
-            pretrain_dataset, batch_size=args.batch_size, shuffle=True
-        )
-        model = PatchTST(config, in_channels=in_channels).to(args.device)
-        model = torch.compile(model)
-
-        print(f"Starting masked-patch pretraining for {args.pretrain_epochs} epochs...")
-        run_pretraining(
-            model=model,
-            loader=pretrain_loader,
-            epochs=args.pretrain_epochs,
-            device=args.device,
-            lr=args.pretrain_lr,
-            mask_ratio=args.pretrain_mask_ratio,
-        )
-        save_checkpoint(
-            checkpoint_path=checkpoint_path,
-            model=model,
-            config_dict=config_dict,
-            metadata={
-                "in_channels": in_channels,
-                "data_path": str(data_path),
-                "val_ratio": args.val_ratio,
-                "test_ratio": args.test_ratio,
-                "scale": scale,
-                "best_val_loss": float("inf"),
-                "training_stage": "pretrain_only",
-                "pretrain_epochs": args.pretrain_epochs,
-                "pretrain_mask_ratio": args.pretrain_mask_ratio,
-                "seed": args.seed,
-            },
-        )
-        print(f"Saved pretrained checkpoint to {checkpoint_path}")
-        return
-
     bundle = build_datasets(
-        data_path=data_path,
+        data_path=Path(args.data),
         seq_len=args.seq_len,
         pred_len=args.pred_len,
         val_ratio=args.val_ratio,
         test_ratio=args.test_ratio,
-        scale=scale,
+        scale=not args.no_scale,
     )
     train_loader = DataLoader(bundle.train, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(bundle.val, batch_size=args.batch_size, shuffle=False)
-    model = PatchTST(config, in_channels=bundle.in_channels).to(args.device)
-    model = torch.compile(model)
 
-    loaded_pretrain_metadata: dict[str, Any] | None = None
-    if pretrained_checkpoint_path is not None:
-        loaded_pretrain_metadata = load_pretrained_backbone(
-            model, pretrained_checkpoint_path, args.device
-        )
-
-    if args.pretrain_epochs > 0 and pretrained_checkpoint_path is None:
-        pretrain_dataset, _ = build_pretrain_dataset(
-            data_path=data_path,
-            seq_len=args.seq_len,
-            val_ratio=args.val_ratio,
-            test_ratio=args.test_ratio,
-            scale=scale,
-        )
-        pretrain_loader = DataLoader(
-            pretrain_dataset, batch_size=args.batch_size, shuffle=True
-        )
-        print(f"Starting masked-patch pretraining for {args.pretrain_epochs} epochs...")
-        run_pretraining(
-            model=model,
-            loader=pretrain_loader,
-            epochs=args.pretrain_epochs,
-            device=args.device,
-            lr=args.pretrain_lr,
-            mask_ratio=args.pretrain_mask_ratio,
-        )
+    model, config_dict = build_model(args, bundle.in_channels)
+    model = model.to(args.device)
+    if args.compile:
+        model = torch.compile(model)
 
     metadata: dict[str, Any] = {
         "in_channels": bundle.in_channels,
-        "data_path": str(data_path),
+        "data_path": str(Path(args.data)),
         "val_ratio": args.val_ratio,
         "test_ratio": args.test_ratio,
-        "scale": scale,
+        "scale": not args.no_scale,
         "best_val_loss": float("inf"),
         "training_stage": "supervised",
-        "pretrain_epochs": args.pretrain_epochs,
-        "pretrain_mask_ratio": args.pretrain_mask_ratio,
         "seed": args.seed,
-        "pretrained_checkpoint": (
-            str(pretrained_checkpoint_path) if pretrained_checkpoint_path else ""
-        ),
-        "linear_probe_epochs": args.linear_probe_epochs,
-        "finetune_epochs": args.finetune_epochs,
     }
-    if loaded_pretrain_metadata is not None:
-        metadata["pretrained_source_data"] = loaded_pretrain_metadata.get(
-            "data_path", ""
-        )
-        metadata["pretrained_source_stage"] = loaded_pretrain_metadata.get(
-            "training_stage", ""
-        )
 
-    best_val_loss = float("inf")
-    early_stopping_enabled = not args.disable_early_stopping
-
-    if args.linear_probe_epochs > 0:
-        freeze_for_linear_probe(model)
-        metadata["training_stage"] = "linear_probe"
-        best_val_loss = run_supervised_phase(
-            model=model,
-            train_loader=train_loader,
-            val_loader=val_loader,
-            device=args.device,
-            epochs=args.linear_probe_epochs,
-            lr=args.probe_lr,
-            scheduler=args.scheduler,
-            patience=args.patience,
-            early_stopping_enabled=early_stopping_enabled,
-            checkpoint_path=checkpoint_path,
-            config_dict=config_dict,
-            metadata=metadata,
-            phase_name="linear_probe",
-            best_val_loss=best_val_loss,
-            resume=args.resume,
-        )
-
-    finetune_epochs = args.finetune_epochs
-    if finetune_epochs > 0 or (
-        args.linear_probe_epochs == 0
-        and (pretrained_checkpoint_path is not None or args.pretrain_epochs > 0)
-    ):
-        unfreeze_all(model)
-        metadata["training_stage"] = "finetune"
-        best_val_loss = run_supervised_phase(
-            model=model,
-            train_loader=train_loader,
-            val_loader=val_loader,
-            device=args.device,
-            epochs=finetune_epochs if finetune_epochs > 0 else args.epochs,
-            lr=args.finetune_lr if finetune_epochs > 0 else args.lr,
-            scheduler=args.scheduler,
-            patience=args.patience,
-            early_stopping_enabled=early_stopping_enabled,
-            checkpoint_path=checkpoint_path,
-            config_dict=config_dict,
-            metadata=metadata,
-            phase_name="finetune",
-            best_val_loss=best_val_loss,
-            resume=args.resume,
-        )
-    elif args.linear_probe_epochs == 0:
-        unfreeze_all(model)
-        metadata["training_stage"] = "supervised"
-        best_val_loss = run_supervised_phase(
-            model=model,
-            train_loader=train_loader,
-            val_loader=val_loader,
-            device=args.device,
-            epochs=args.epochs,
-            lr=args.lr,
-            scheduler=args.scheduler,
-            patience=args.patience,
-            early_stopping_enabled=early_stopping_enabled,
-            checkpoint_path=checkpoint_path,
-            config_dict=config_dict,
-            metadata=metadata,
-            phase_name="supervised",
-            best_val_loss=best_val_loss,
-            resume=args.resume,
-        )
+    train_forecast(
+        model=model,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        device=args.device,
+        epochs=args.epochs,
+        lr=args.lr,
+        scheduler=args.scheduler,
+        patience=args.patience,
+        early_stopping_enabled=not args.disable_early_stopping,
+        checkpoint_path=checkpoint_path,
+        config_dict=config_dict,
+        metadata=metadata,
+        resume=args.resume,
+    )
 
 
 if __name__ == "__main__":

@@ -82,25 +82,6 @@ class ForecastWindowDataset(Dataset):
         return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 
-class ContextWindowDataset(Dataset):
-    def __init__(self, series: np.ndarray, seq_len: int) -> None:
-        self.series = series
-        self.seq_len = seq_len
-
-        if len(self.series) < self.seq_len:
-            raise ValueError(
-                f"Split is too small for seq_len={seq_len}. Need at least {self.seq_len} timesteps, "
-                f"got {len(self.series)}."
-            )
-
-    def __len__(self) -> int:
-        return len(self.series) - self.seq_len + 1
-
-    def __getitem__(self, idx: int) -> torch.Tensor:
-        x = self.series[idx : idx + self.seq_len]
-        return torch.tensor(x, dtype=torch.float32)
-
-
 def _compute_split_points(length: int, val_ratio: float, test_ratio: float) -> tuple[int, int]:
     if not 0.0 <= val_ratio < 1.0 or not 0.0 <= test_ratio < 1.0:
         raise ValueError("val_ratio and test_ratio must be in [0, 1)")
@@ -181,29 +162,3 @@ def build_datasets(
         scaler=scaler,
         series_length=total_length,
     )
-
-
-def build_pretrain_dataset(
-    data_path: str | Path,
-    seq_len: int,
-    val_ratio: float = 0.1,
-    test_ratio: float = 0.2,
-    scale: bool = True,
-) -> tuple[ContextWindowDataset, int]:
-    series = load_time_series(data_path)
-    border1s, border2s = _compute_split_borders(len(series), seq_len, val_ratio, test_ratio)
-    train_start = border1s[0]
-    train_end = border2s[0]
-
-    if train_end < seq_len:
-        raise ValueError(
-            f"Training split is too small for seq_len={seq_len}. Need at least {seq_len} timesteps."
-        )
-
-    if scale:
-        scaler = StandardScaler()
-        scaler.fit(series[:train_end])
-        series = scaler.transform(series).astype(np.float32)
-
-    dataset = ContextWindowDataset(series[train_start:train_end], seq_len=seq_len)
-    return dataset, series.shape[1]
