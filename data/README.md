@@ -7,12 +7,7 @@ This project uses the following datasets referenced by the PatchTST paper:
 - PeMS Traffic Dataset (Caltrans)
   - https://drive.google.com/file/d/1U3BZ3Wvuvd9HVAx5Nl3bHYG9rsh5-yZX/view?usp=drive_link
 - Jena Weather Dataset (MPI-BGC)
-  - [https://www.bgc-jena.mpg.de/wetter/](https://drive.google.com/file/d/1Tc7GeVN7DLEl-RAs-JVwG9yFMf--S8dy/view?usp=drive_link)
+  - https://drive.google.com/file/d/1Tc7GeVN7DLEl-RAs-JVwG9yFMf--S8dy/view?usp=drive_link
 
 ## Download Notes
-- Some datasets (e.g., PeMS) may require account creation or data access approval.
-- Add any preprocessing steps, file naming conventions, and train/val/test splits here.
-
-## Expected Layout (suggested)
-- `data/raw/` for original downloads
-- `data/processed/` for cleaned / resampled files
+- The datasets can be downloaded directly from the Google Drive links
