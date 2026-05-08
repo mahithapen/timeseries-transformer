@@ -6,7 +6,9 @@
 This repository contains our CS 4782 final project re-implementation of **"A Time Series is Worth 64 Words: Long-Term Forecasting with Transformers"** (ICLR 2023). The paper introduces **PatchTST**, a transformer architecture that improves long-term time series forecasting via patching and channel independence, enabling longer look-back windows with lower compute.
 
 ## Chosen Result
-We run supervised forecasting experiments on the **Electricity, Traffic, Weather, and Ithaca Weather** datasets, comparing DLinear with PatchTST/42 and PatchTST/64 style variants.
+We run supervised forecasting experiments on the **Electricity, Traffic, and Weather** datasets, comparing DLinear with PatchTST/42 and PatchTST/64 style variants with a prediction length of 96. We compare the results to the DLinear model.
+<img width="400" height="293" alt="image" src="https://github.com/user-attachments/assets/164531d0-04ad-4e9e-a302-00e37a636efa" />
+
 
 ## GitHub Contents
 - `code/`: Re-implementation code and configs
