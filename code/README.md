@@ -7,7 +7,6 @@ This folder contains the training, evaluation, forecasting, data-loading, and mo
 Run commands from the repository root:
 
 ```bash
-cd /Users/cindyliang/cs4782/timeseries-transformer
 source venv/bin/activate
 ```
 
