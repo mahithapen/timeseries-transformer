@@ -5,6 +5,9 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 
+HIERARCHICAL_LEVELS = 2
+HIERARCHICAL_MERGE_FACTOR = 2
+
 @dataclass
 class PatchTSTConfig:
     seq_len: int
@@ -12,8 +15,6 @@ class PatchTSTConfig:
     patch_len: int = 16
     stride: int = 8
     hierarchical_patching: bool = False
-    hierarchical_levels: int = 2
-    hierarchical_merge_factor: int = 2
     d_model: int = 128
     n_heads: int = 16
     n_layers: int = 3
@@ -123,10 +124,6 @@ class PatchTST(nn.Module):
         self.in_channels = in_channels
         self.revin = RevIN(in_channels, affine=config.revin_affine) if config.use_instance_norm else None
         self.hierarchical_patching = config.hierarchical_patching
-        self.hierarchical_levels = max(1, config.hierarchical_levels)
-        self.hierarchical_merge_factor = config.hierarchical_merge_factor
-        if self.hierarchical_merge_factor < 2:
-            raise ValueError("hierarchical_merge_factor must be at least 2")
 
         self.pad_layer = None
         self.num_patches = (config.seq_len - config.patch_len) // config.stride + 1
@@ -138,10 +135,10 @@ class PatchTST(nn.Module):
         self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches)
         self.input_dropout = nn.Dropout(config.dropout)
         if self.hierarchical_patching:
-            self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
+            self.encoders = nn.ModuleList(self._build_encoder() for _ in range(HIERARCHICAL_LEVELS))
             self.merge_layers = nn.ModuleList(
-                nn.Linear(config.d_model * self.hierarchical_merge_factor, config.d_model)
-                for _ in range(self.hierarchical_levels - 1)
+                nn.Linear(config.d_model * HIERARCHICAL_MERGE_FACTOR, config.d_model)
+                for _ in range(HIERARCHICAL_LEVELS - 1)
             )
             self.fusion_norm = nn.LayerNorm(config.d_model)
         else:
@@ -191,9 +188,8 @@ class PatchTST(nn.Module):
             outputs.append(current)
 
         fused = outputs[0]
-        scale = self.hierarchical_merge_factor
         for level, coarse in enumerate(outputs[1:], start=1):
-            repeat = scale ** level
+            repeat = HIERARCHICAL_MERGE_FACTOR ** level
             upsampled = coarse.repeat_interleave(repeat, dim=1)[:, : self.num_patches]
             fused = fused + upsampled
 
@@ -201,13 +197,13 @@ class PatchTST(nn.Module):
 
     def _merge_patch_tokens(self, tokens: torch.Tensor, merge_layer: nn.Linear) -> torch.Tensor:
         batch_size, num_tokens, dim = tokens.shape
-        remainder = num_tokens % self.hierarchical_merge_factor
+        remainder = num_tokens % HIERARCHICAL_MERGE_FACTOR
         if remainder != 0:
-            pad_count = self.hierarchical_merge_factor - remainder
+            pad_count = HIERARCHICAL_MERGE_FACTOR - remainder
             pad_tokens = tokens[:, -1:, :].expand(batch_size, pad_count, dim)
             tokens = torch.cat([tokens, pad_tokens], dim=1)
 
-        merged = tokens.reshape(batch_size, -1, self.hierarchical_merge_factor * dim)
+        merged = tokens.reshape(batch_size, -1, HIERARCHICAL_MERGE_FACTOR * dim)
         return merge_layer(merged)
 
     def forward(self, x: torch.Tensor):

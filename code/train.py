@@ -31,10 +31,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--hierarchical-patching",
         action="store_true",
-        help="Enable multi-scale hierarchical patching with progressive token merging.",
+        help="Enable two-level hierarchical patching with adjacent token merging.",
     )
-    parser.add_argument("--hierarchical-levels", type=int, default=2)
-    parser.add_argument("--hierarchical-merge-factor", type=int, default=2)
     parser.add_argument("--d-model", type=int, default=128)
     parser.add_argument("--n-heads", type=int, default=16)
     parser.add_argument("--n-layers", type=int, default=3)
@@ -102,8 +100,6 @@ def build_patchtst_config(args: argparse.Namespace) -> PatchTSTConfig:
         patch_len=args.patch_len,
         stride=args.stride,
         hierarchical_patching=args.hierarchical_patching,
-        hierarchical_levels=args.hierarchical_levels,
-        hierarchical_merge_factor=args.hierarchical_merge_factor,
         d_model=args.d_model,
         n_heads=args.n_heads,
         n_layers=args.n_layers,

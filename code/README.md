@@ -82,13 +82,13 @@ python code/train.py \
 
 ### Hierarchical PatchTST
 
-Add these flags to a PatchTST command:
+Add this flag to a PatchTST command:
 
 ```bash
---hierarchical-patching \
---hierarchical-levels 2 \
---hierarchical-merge-factor 2
+--hierarchical-patching
 ```
+
+The hierarchy is fixed to two levels with adjacent-token merging.
 
 Example:
 
@@ -102,8 +102,6 @@ python code/train.py \
   --stride 8 \
   --padding-patch end \
   --hierarchical-patching \
-  --hierarchical-levels 2 \
-  --hierarchical-merge-factor 2 \
   --d-model 128 \
   --n-heads 16 \
   --n-layers 3 \
