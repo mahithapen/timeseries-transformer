@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 
 import torch
@@ -28,18 +27,10 @@ class PatchTSTConfig:
     padding_patch: str | None = "end"
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, d_model: int, max_len: int = 5000, learnable: bool = True):
+    def __init__(self, d_model: int, max_len: int = 5000):
         super().__init__()
-        if learnable:
-            self.pe = nn.Parameter(torch.zeros(1, max_len, d_model))
-            nn.init.uniform_(self.pe, -0.02, 0.02)
-        else:
-            pe = torch.zeros(max_len, d_model)
-            position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-            div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-            pe[:, 0::2] = torch.sin(position * div_term)
-            pe[:, 1::2] = torch.cos(position * div_term)
-            self.register_buffer("pe", pe.unsqueeze(0))
+        self.pe = nn.Parameter(torch.zeros(1, max_len, d_model))
+        nn.init.uniform_(self.pe, -0.02, 0.02)
 
     def forward(self, x):
         return x + self.pe[:, :x.size(1), :]
@@ -144,7 +135,7 @@ class PatchTST(nn.Module):
             self.num_patches += 1
         
         self.patch_embed = nn.Linear(config.patch_len, config.d_model)
-        self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches, learnable=True)
+        self.positional = PositionalEncoding(config.d_model, max_len=self.num_patches)
         self.input_dropout = nn.Dropout(config.dropout)
         if self.hierarchical_patching:
             self.encoders = nn.ModuleList(self._build_encoder() for _ in range(self.hierarchical_levels))
