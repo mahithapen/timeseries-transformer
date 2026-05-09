@@ -135,7 +135,7 @@ python code/eval.py \
 Generate predictions beyond the end of a CSV:
 
 ```bash
-python code/forecast_future.py \
+python code/generate_forecast.py \
   --checkpoint checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt \
   --data data/weather.csv \
   --output results/weather_future_forecast.csv

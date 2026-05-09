@@ -1,3 +1,8 @@
+"""
+This file predicts timesteps after the end of a dataset.
+We use this file to predict future weather predictions for the ithaca_weather.csv
+dataset used in our poster presentation. 
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,7 +14,6 @@ import pandas as pd
 import torch
 from sklearn.preprocessing import StandardScaler
 
-from models.dlinear import DLinear
 from models.patchtst import PatchTST, PatchTSTConfig
 
 
@@ -44,13 +48,8 @@ def infer_future_dates(frame: pd.DataFrame, pred_len: int) -> list[str]:
 def build_model(checkpoint: dict, device: str) -> torch.nn.Module:
     config = checkpoint["config"]
     model_type = config.get("model_type", "patchtst")
-
-    if model_type == "dlinear":
-        return DLinear(
-            seq_len=config["seq_len"],
-            pred_len=config["pred_len"],
-            channels=checkpoint["in_channels"],
-        ).to(device)
+    if model_type != "patchtst":
+        raise ValueError(f"generate_forecast.py only supports PatchTST checkpoints, got {model_type!r}.")
 
     config_fields = {field.name for field in fields(PatchTSTConfig)}
     patchtst_config = PatchTSTConfig(
@@ -61,6 +60,7 @@ def build_model(checkpoint: dict, device: str) -> torch.nn.Module:
 
 def main() -> None:
     args = parse_args()
+    #load saved model checkpoint
     checkpoint = torch.load(args.checkpoint, map_location=args.device)
     config = checkpoint["config"]
     data_path = args.data or checkpoint["data_path"]
@@ -82,6 +82,7 @@ def main() -> None:
     if len(processed) < config["seq_len"]:
         raise ValueError(f"Need at least seq_len={config['seq_len']} rows, got {len(processed)}")
 
+    #takes the last seq_len rows
     x = torch.tensor(processed[-config["seq_len"] :], dtype=torch.float32).unsqueeze(0).to(args.device)
     model = build_model(checkpoint, args.device)
     state_dict = {
@@ -91,6 +92,7 @@ def main() -> None:
     model.load_state_dict(state_dict)
     model.eval()
 
+    #predicts the next pred_len timesteps
     with torch.no_grad():
         pred = model(x).cpu().numpy()[0]
 
