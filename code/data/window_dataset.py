@@ -82,29 +82,6 @@ class ForecastWindowDataset(Dataset):
         return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 
-def _compute_split_points(length: int, val_ratio: float, test_ratio: float) -> tuple[int, int]:
-    if not 0.0 <= val_ratio < 1.0 or not 0.0 <= test_ratio < 1.0:
-        raise ValueError("val_ratio and test_ratio must be in [0, 1)")
-    if val_ratio + test_ratio >= 1.0:
-        raise ValueError("val_ratio + test_ratio must be less than 1")
-
-    train_end = int(length * (1.0 - val_ratio - test_ratio))
-    val_end = int(length * (1.0 - test_ratio))
-    return train_end, val_end
-
-
-def _compute_split_borders(
-    length: int,
-    seq_len: int,
-    val_ratio: float,
-    test_ratio: float,
-) -> tuple[list[int], list[int]]:
-    train_end, val_end = _compute_split_points(length, val_ratio, test_ratio)
-    border1s = [0, train_end - seq_len, val_end - seq_len]
-    border2s = [train_end, val_end, length]
-    return border1s, border2s
-
-
 def build_datasets(
     data_path: str | Path,
     seq_len: int,
@@ -113,11 +90,28 @@ def build_datasets(
     test_ratio: float = 0.2,
     scale: bool = True,
 ) -> DatasetBundle:
+    """
+    Load a time series file, split it into train/val/test ranges, optionally scale
+    using train-split statistics, and build sliding-window forecasting datasets.
+
+    Each sample contains an input window of length seq_len and a target window of
+    length pred_len.
+    """
     series = load_time_series(data_path)
     total_length = len(series)
-    border1s, border2s = _compute_split_borders(total_length, seq_len, val_ratio, test_ratio)
-    train_start, val_start, test_start = border1s
-    train_end, val_end, test_end = border2s
+
+    if not 0.0 <= val_ratio < 1.0 or not 0.0 <= test_ratio < 1.0:
+        raise ValueError("val_ratio and test_ratio must be in [0, 1)")
+    if val_ratio + test_ratio >= 1.0:
+        raise ValueError("val_ratio + test_ratio must be less than 1")
+
+    train_end = int(total_length * (1.0 - val_ratio - test_ratio))
+    val_end = int(total_length * (1.0 - test_ratio))
+
+    train_start = 0
+    val_start = train_end - seq_len
+    test_start = val_end - seq_len
+    test_end = total_length
 
     min_required = seq_len + pred_len
     if train_end < min_required:
