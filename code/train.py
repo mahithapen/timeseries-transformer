@@ -1,17 +1,25 @@
 from __future__ import annotations
 
 import argparse
+import random
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from data.window_dataset import build_datasets
 from models.dlinear import DLinear
 from models.patchtst import PatchTST, PatchTSTConfig
-from utils.seed import set_seed
+from preprocess_data import build_datasets
+
+
+def set_seed(seed: int = 42) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 
 def parse_args() -> argparse.Namespace:

@@ -2,6 +2,13 @@
 
 This folder contains the training, evaluation, forecasting, data-loading, and model code for the time-series forecasting experiments.
 
+Key files:
+- `train.py`: training entry point
+- `eval.py`: checkpoint evaluation
+- `generate_forecast.py`: future forecast generation for PatchTST checkpoints
+- `preprocess_data.py`: dataset loading, scaling, splitting, and sliding-window creation
+- `models/`: model definitions
+
 ## Setup
 
 Run commands from the repository root:
