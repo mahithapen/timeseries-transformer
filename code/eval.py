@@ -6,9 +6,9 @@ from dataclasses import fields
 import torch
 from torch.utils.data import DataLoader
 
-from data.window_dataset import build_datasets
 from models.dlinear import DLinear
 from models.patchtst import PatchTST, PatchTSTConfig
+from preprocess_data import build_datasets
 
 
 def parse_args() -> argparse.Namespace:
