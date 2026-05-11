@@ -12,6 +12,13 @@ We run supervised forecasting experiments on the **Electricity, Traffic, and Wea
 
 ## GitHub Contents
 - `code/`: Re-implementation code and configs
+  - `data/`: Builds the sliding window dataset
+  - `models/`: Holds the code for PatchTST and dLinear
+  - `utils/`: Used to set the seed
+  - `Final_Colab.ipynb`: Jupyter notebook used to train and evaluate our model to generate our results
+  - `eval.py`: Python file used to evaluate our model
+  - `train.py`: Python file used to train our model
+  - `generate_forecast.py`: Python file used to make future predictions on values that extend beyond the dataset (Ithaca weather predicitons for our poster)
 - `data/`: Dataset download instructions and metadata
 - `results/`: Output tables, plots, and logs
 - `poster/`: Final poster PDF
@@ -19,17 +26,17 @@ We run supervised forecasting experiments on the **Electricity, Traffic, and Wea
 - `docs/`: Internal notes and checklists
 
 ## Re-implementation Details
-- **Framework:** PyTorch
-- **Key ideas:** channel independence, instance normalization, patching (length `P`, stride `S`), learnable positional encodings, transformer encoder, MLP head
-- **Tasks:**
-  - Supervised forecasting (MSE/MAE)
-- **Current recipe:** prediction length 96, 16 attention heads, and 100 supervised epochs
+Time series input is first processed through window_dataset.py to generate a train/test split and generate sliding windows. We implemented our supervised PatchTTST by first using Reversible Instance Normalization, treating each input feature independently (channel independence), and apply patching (grouping local timesteps to a singular token) with a patch length of 16 and a stride of 8. Learnable positional embeddings are added, and this input is then fed into a Transformer encoder with 3 encoder layers. Each layer uses multi-head self-attention with 16 attention heads, followed by residual connection and batch normalization, then a feed-forward network, followed by another residual connection and batch normalization. Finally, we perform forecasting with a linear head. To evaluate our model using MSE and MAE. We train for 100 epochs with early stopping, Adam optimizer, and a learning rate scheduler. We predict for the next 96 time steps and use look-back windows of length 336 and 512. 
+
+For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens from the output of the first layer were merged and projected back to the original embedding dimension before being processed by a second encoder level. The outputs of the first and second layers are combined and forecasting is again performed with a linear head.
 
 ## Reproduction Steps
 1. Create and activate a Python environment
-2. Install dependencies from `code/requirements.txt` (to be added)
+2. Install dependencies from `code/requirements.txt` 
 3. Download datasets listed in `data/README.md`
-4. Run training scripts in `code/` (commands to be added)
+4. Run training scripts in `code/` 
+
+We trained on [INSERT GPU] for approximately [X] hours to get to 100 epochs.
 
 ## Results / Insights
 Results will be added to `results/` and summarized here once experiments complete.
