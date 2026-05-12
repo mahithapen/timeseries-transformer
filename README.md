@@ -39,7 +39,98 @@ For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens fr
 1. Create and activate a Python environment
 2. Install dependencies from `code/requirements.txt`
 3. Download datasets listed in `data/README.md`
-4. Run training scripts in `code/`
+
+### Training
+#### DLinear
+
+```bash
+python code/train.py \
+  --model-type dlinear \
+  --data data/weather.csv \
+  --seq-len 336 \
+  --pred-len 96 \
+  --epochs 100 \
+  --batch-size 128 \
+  --lr 1e-4 \
+  --checkpoint checkpoints/weather_supervised_dlinear_seq336_pred96.pt
+```
+
+#### PatchTST/42
+
+```bash
+python code/train.py \
+  --model-type patchtst \
+  --data data/weather.csv \
+  --seq-len 336 \
+  --pred-len 96 \
+  --epochs 100 \
+  --batch-size 128 \
+  --lr 1e-4 \
+  --checkpoint checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+```
+
+#### PatchTST/64
+
+```bash
+python code/train.py \
+  --model-type patchtst \
+  --data data/weather.csv \
+  --seq-len 512 \
+  --pred-len 96 \
+  --epochs 100 \
+  --batch-size 128 \
+  --lr 1e-4 \
+  --checkpoint checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+```
+
+#### Hierarchical PatchTST
+
+Add this flag to a PatchTST command:
+
+```bash
+--hierarchical-patching
+```
+
+Use `--resume` to continue from an existing checkpoint.
+
+### Evaluation
+
+Evaluate a checkpoint on the validation or test split:
+
+```bash
+python code/eval.py \
+  --checkpoint checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt \
+  --data data/weather.csv \
+  --split test \
+  --batch-size 128
+```
+
+`--data` is optional if the checkpoint was trained with the same dataset path you want to evaluate.
+
+### Future Forecasting
+
+Generate predictions beyond the end of a CSV:
+
+```bash
+python code/generate_forecast.py \
+  --checkpoint checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt \
+  --data data/weather.csv \
+  --output results/weather_future_forecast.csv
+```
+
+The output CSV contains one row per forecast horizon step and feature.
+
+### Colab Workflow
+
+Use `code/Final_Colab.ipynb` for the full Colab workflow. The notebook runs:
+
+- DLinear supervised
+- PatchTST/42 supervised
+- PatchTST/64 supervised
+- hierarchical PatchTST/42
+- hierarchical PatchTST/64
+
+It saves checkpoints and summary metrics under the configured Drive paths.
 
 We trained on NVIDIA A100 GPU.
 
