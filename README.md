@@ -42,19 +42,23 @@ For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens fr
 We trained on NVIDIA A100 GPU.
 
 ## Results / Insights
+<img width="448" height="311" alt="image" src="https://github.com/user-attachments/assets/0be41687-45d9-4045-a01e-02085b497454" />
+We showed that the PatchTST and HPatch model outperforms dLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we fail to see significant gains from implementing hierarchical patching (HPatch), which we attribute to potential strong local periodicity that may already exist in the current datasets, and its true benefits could be revealed in contexts with greater long-range dependencies. 
 
-Results will be added to `results/` and summarized here once experiments complete.
+The expected end result of using this GitHub repo is a trained forecasting model checkpoint, test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. 
 
 ## Conclusion
 
-We will summarize key takeaways after the experiments and analysis are complete.
+Transformers can be optimized for time series forecasting through patching and channel independence. Patching allows us to compute more informative attention calculations due to the preservation of local semantic information within a token. Linear models like dLinear reach a plateau as lookback windows increase; the time and space complexity reduction in patching allows us to scale the lookback window to improve accuracy. By isolating variables through channel independence, the model was able to learn distinct attention patterns for the diverse behaviors in the datasets, while preventing noise leakage between channels. However, we learned how hard it may be to add extensions to the study due to varying contexts in datasets, hyperparameters to tune, and design choices to make when implementing hierarchical patching. 
 
 ## References
 
-- Yuqi Nie, Nam H. Nguyen, Phanwadee Sinthong, Jayant Kalagnanam. _A Time Series is Worth 64 Words: Long-Term Forecasting with Transformers_. ICLR 2023.
-- Electricity Load Diagrams 2011-2014 (UCI ML Repository)
-- PeMS Traffic Dataset
-- Jena Weather Dataset
+[1] Yuqi Nie, Nam H. Nguyen, Phanwadee Sinthong, Jayant Kalagnanam. _A Time Series is Worth 64 Words: Long-Term Forecasting with Transformers_. ICLR 2023.
+
+[2] Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu. Are transformers effective for time series forecasting? arXiv preprint arXiv:2205.13504, 2022.
+
+[3] Haixu Wu, Jiehui Xu, Jianmin Wang, and Mingsheng Long. Autoformer: Decomposition transformers with Auto-Correlation for long-term series forecasting. In Advances in Neural Information Processing Systems, 2021.
+
 
 ## Acknowledgements
 
