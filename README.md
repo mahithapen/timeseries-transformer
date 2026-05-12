@@ -136,9 +136,10 @@ We trained on NVIDIA A100 GPU.
 
 ## Results / Insights
 <img width="448" height="311" alt="image" src="https://github.com/user-attachments/assets/0be41687-45d9-4045-a01e-02085b497454" />
+
 We showed that the PatchTST and HPatch model outperforms dLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we fail to see significant gains from implementing hierarchical patching (HPatch), which we attribute to potential strong local periodicity that may already exist in the current datasets, and its true benefits could be revealed in contexts with greater long-range dependencies. 
 
-The expected end result of using this GitHub repo is a trained forecasting model checkpoint, test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. 
+The expected end result of using this GitHub repo is a trained forecasting model checkpoint under the directory checkpoints/ (the training file will create this directory if it doesn't already exist), test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. The checkpoints are used for evaluation and forecasting without the need for retraining.
 
 ## Conclusion
 
