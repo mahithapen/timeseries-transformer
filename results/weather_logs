@@ -1,0 +1,295 @@
+Skipping completed run: weather supervised dlinear pred_len=96
+Running weather supervised patchtst42 pred_len=96 on cuda
+Resuming supervised from checkpoint: /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+Resumed successfully at epoch 1 with best val loss 0.4053
+Starting supervised on cuda from epoch 1 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 03:32:41.652000 39521 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4509 - val_loss: 0.3951
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.4413 - val_loss: 0.3944
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.4324 - val_loss: 0.3919
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.4273 - val_loss: 0.3931
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.4231 - val_loss: 0.3903
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.4194 - val_loss: 0.3901
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.4168 - val_loss: 0.3876
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.4140 - val_loss: 0.3857
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.4131 - val_loss: 0.3846
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.4117 - val_loss: 0.3847
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.4096 - val_loss: 0.3841
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.4092 - val_loss: 0.3848
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.4077 - val_loss: 0.3833
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.4071 - val_loss: 0.3844
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.4064 - val_loss: 0.3834
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.4059 - val_loss: 0.3834
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.4055 - val_loss: 0.3824
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.4047 - val_loss: 0.3826
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.4043 - val_loss: 0.3825
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.4042 - val_loss: 0.3832
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.4033 - val_loss: 0.3829
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.4031 - val_loss: 0.3826
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.4032 - val_loss: 0.3824
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.4029 - val_loss: 0.3831
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.4026 - val_loss: 0.3827
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.4021 - val_loss: 0.3826
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.4020 - val_loss: 0.3822
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.4016 - val_loss: 0.3825
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.4018 - val_loss: 0.3826
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.4015 - val_loss: 0.3822
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.4015 - val_loss: 0.3823
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.4017 - val_loss: 0.3824
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.4014 - val_loss: 0.3824
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.4014 - val_loss: 0.3826
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.4011 - val_loss: 0.3822
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.4011 - val_loss: 0.3824
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.4008 - val_loss: 0.3823
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.4012 - val_loss: 0.3822
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.4009 - val_loss: 0.3826
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.4009 - val_loss: 0.3824
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.4010 - val_loss: 0.3825
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.4005 - val_loss: 0.3822
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.4006 - val_loss: 0.3824
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.4004 - val_loss: 0.3824
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.4006 - val_loss: 0.3822
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.4006 - val_loss: 0.3824
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.4003 - val_loss: 0.3823
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.4004 - val_loss: 0.3823
+Early stopping triggered during supervised after 56 epochs.
+Saved metrics to summary in Drive!
+Running weather supervised patchtst64 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 04:19:48.723000 51769 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 1/100 - lr: 0.0001 - train_loss: 0.4901 - val_loss: 0.3955
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4390 - val_loss: 0.3906
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.4286 - val_loss: 0.3905
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.4213 - val_loss: 0.3888
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.4165 - val_loss: 0.3876
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.4125 - val_loss: 0.3833
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.4104 - val_loss: 0.3884
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.4077 - val_loss: 0.3850
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.4072 - val_loss: 0.3817
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.4038 - val_loss: 0.3842
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.4025 - val_loss: 0.3829
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.4012 - val_loss: 0.3809
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.4004 - val_loss: 0.3847
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.3994 - val_loss: 0.3826
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.4001 - val_loss: 0.3854
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.3980 - val_loss: 0.3827
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.3975 - val_loss: 0.3836
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.3966 - val_loss: 0.3840
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.3962 - val_loss: 0.3841
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.3958 - val_loss: 0.3851
+
+Skipping completed run: weather supervised dlinear pred_len=96
+Running weather supervised patchtst42 pred_len=96 on cuda
+Resuming supervised from checkpoint: /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+Resumed successfully at epoch 1 with best val loss 0.4053
+Starting supervised on cuda from epoch 1 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 03:32:41.652000 39521 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4509 - val_loss: 0.3951
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.4413 - val_loss: 0.3944
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.4324 - val_loss: 0.3919
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.4273 - val_loss: 0.3931
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.4231 - val_loss: 0.3903
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.4194 - val_loss: 0.3901
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.4168 - val_loss: 0.3876
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.4140 - val_loss: 0.3857
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.4131 - val_loss: 0.3846
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.4117 - val_loss: 0.3847
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.4096 - val_loss: 0.3841
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.4092 - val_loss: 0.3848
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.4077 - val_loss: 0.3833
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.4071 - val_loss: 0.3844
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.4064 - val_loss: 0.3834
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.4059 - val_loss: 0.3834
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.4055 - val_loss: 0.3824
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.4047 - val_loss: 0.3826
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.4043 - val_loss: 0.3825
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.4042 - val_loss: 0.3832
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.4033 - val_loss: 0.3829
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.4031 - val_loss: 0.3826
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.4032 - val_loss: 0.3824
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.4029 - val_loss: 0.3831
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.4026 - val_loss: 0.3827
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.4021 - val_loss: 0.3826
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.4020 - val_loss: 0.3822
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.4016 - val_loss: 0.3825
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.4018 - val_loss: 0.3826
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.4015 - val_loss: 0.3822
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.4015 - val_loss: 0.3823
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.4017 - val_loss: 0.3824
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.4014 - val_loss: 0.3824
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.4014 - val_loss: 0.3826
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.4011 - val_loss: 0.3822
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.4011 - val_loss: 0.3824
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.4008 - val_loss: 0.3823
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.4012 - val_loss: 0.3822
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.4009 - val_loss: 0.3826
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.4009 - val_loss: 0.3824
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.4010 - val_loss: 0.3825
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.4005 - val_loss: 0.3822
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.4006 - val_loss: 0.3824
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.4004 - val_loss: 0.3824
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.4006 - val_loss: 0.3822
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.4005 - val_loss: 0.3823
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.4006 - val_loss: 0.3823
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.4006 - val_loss: 0.3824
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.4003 - val_loss: 0.3823
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.4004 - val_loss: 0.3823
+Early stopping triggered during supervised after 56 epochs.
+Saved metrics to summary in Drive!
+Running weather supervised patchtst64 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 04:19:48.723000 51769 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 1/100 - lr: 0.0001 - train_loss: 0.4901 - val_loss: 0.3955
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4390 - val_loss: 0.3906
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.4286 - val_loss: 0.3905
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.4213 - val_loss: 0.3888
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.4165 - val_loss: 0.3876
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.4125 - val_loss: 0.3833
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.4104 - val_loss: 0.3884
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.4077 - val_loss: 0.3850
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.4072 - val_loss: 0.3817
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.4038 - val_loss: 0.3842
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.4025 - val_loss: 0.3829
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.4012 - val_loss: 0.3809
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.4004 - val_loss: 0.3847
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.3994 - val_loss: 0.3826
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.4001 - val_loss: 0.3854
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.3980 - val_loss: 0.3827
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.3975 - val_loss: 0.3836
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.3966 - val_loss: 0.3840
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.3962 - val_loss: 0.3841
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.3958 - val_loss: 0.3851
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.3955 - val_loss: 0.3847
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.3946 - val_loss: 0.3871
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.3956 - val_loss: 0.3861
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.3942 - val_loss: 0.3863
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.3941 - val_loss: 0.3874
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.3950 - val_loss: 0.3856
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.3934 - val_loss: 0.3870
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.3939 - val_loss: 0.3873
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.3930 - val_loss: 0.3871
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.3927 - val_loss: 0.3869
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.3928 - val_loss: 0.3872
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.3927 - val_loss: 0.3873
+Early stopping triggered during supervised after 32 epochs.
+Saved metrics to summary in Drive!
+Skipping weather hierarchical run for DLinear (not supported).
+Running weather hierarchical patchtst42 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 04:56:44.843000 61532 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 1/100 - lr: 0.0001 - train_loss: 0.5160 - val_loss: 0.4137
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4570 - val_loss: 0.3946
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.4398 - val_loss: 0.3978
+supervised 4/100 - lr: 9e-05 - train_loss: 0.4307 - val_loss: 0.3946
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.4242 - val_loss: 0.3954
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.4195 - val_loss: 0.3929
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
+
+
+Skipping completed run: weather supervised dlinear pred_len=96
+Skipping completed run: weather supervised patchtst42 pred_len=96
+Skipping completed run: weather supervised patchtst64 pred_len=96
+Skipping weather hierarchical run for DLinear (not supported).
+Running weather hierarchical patchtst42 pred_len=96 on cuda
+Resuming supervised from checkpoint: /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
+Resumed successfully at epoch 14 with best val loss 0.3887
+Starting supervised on cuda from epoch 14 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 15:11:09.040000 4379 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.4003 - val_loss: 0.3904
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.4000 - val_loss: 0.3906
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.3984 - val_loss: 0.3897
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.3977 - val_loss: 0.3904
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.3971 - val_loss: 0.3906
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.3967 - val_loss: 0.3902
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.3962 - val_loss: 0.3900
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.3959 - val_loss: 0.3909
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.3956 - val_loss: 0.3904
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.3953 - val_loss: 0.3892
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.3951 - val_loss: 0.3904
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.3947 - val_loss: 0.3896
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.3945 - val_loss: 0.3901
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.3940 - val_loss: 0.3893
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.3949 - val_loss: 0.3898
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.3945 - val_loss: 0.3897
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.3943 - val_loss: 0.3892
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.3944 - val_loss: 0.3899
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.3940 - val_loss: 0.3899
+Early stopping triggered during supervised after 33 epochs.
+Saved metrics to summary in Drive!
+Running weather hierarchical patchtst64 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0501 15:38:09.769000 11902 torch/_inductor/utils.py:1679] [0/0] Not enough SMs to use max_autotune_gemm mode
+supervised 1/100 - lr: 0.0001 - train_loss: 0.5081 - val_loss: 0.4087
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst64_seq512_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.4467 - val_loss: 0.3914
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst64_seq512_pred96.pt
