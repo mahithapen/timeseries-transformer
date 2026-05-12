@@ -49,15 +49,6 @@ python code/train.py \
   --data data/weather.csv \
   --seq-len 336 \
   --pred-len 96 \
-  --patch-len 16 \
-  --stride 8 \
-  --padding-patch end \
-  --d-model 128 \
-  --n-heads 16 \
-  --n-layers 3 \
-  --d-ff 256 \
-  --dropout 0.2 \
-  --fc-dropout 0.2 \
   --epochs 100 \
   --batch-size 128 \
   --lr 1e-4 \
@@ -72,15 +63,6 @@ python code/train.py \
   --data data/weather.csv \
   --seq-len 512 \
   --pred-len 96 \
-  --patch-len 16 \
-  --stride 8 \
-  --padding-patch end \
-  --d-model 128 \
-  --n-heads 16 \
-  --n-layers 3 \
-  --d-ff 256 \
-  --dropout 0.2 \
-  --fc-dropout 0.2 \
   --epochs 100 \
   --batch-size 128 \
   --lr 1e-4 \
@@ -105,21 +87,14 @@ python code/train.py \
   --data data/weather.csv \
   --seq-len 336 \
   --pred-len 96 \
-  --patch-len 16 \
-  --stride 8 \
-  --padding-patch end \
   --hierarchical-patching \
-  --d-model 128 \
-  --n-heads 16 \
-  --n-layers 3 \
-  --d-ff 256 \
-  --dropout 0.2 \
-  --fc-dropout 0.2 \
   --epochs 100 \
   --batch-size 128 \
   --lr 1e-4 \
   --checkpoint checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
 ```
+
+The PatchTST recipe is fixed in `train.py`: patch length 16, stride 8, end padding, `d_model=128`, 16 heads, 3 encoder layers, `d_ff=256`, dropout 0.2, type3 scheduler, patience 20, seed 42, scaling enabled, and a 10/20 validation/test split.
 
 Use `--resume` to continue from an existing checkpoint.
 

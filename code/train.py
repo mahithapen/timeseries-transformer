@@ -14,6 +14,25 @@ from models.dlinear import DLinear
 from models.patchtst import PatchTST, PatchTSTConfig
 from preprocess_data import build_datasets
 
+PATCH_LEN = 16
+STRIDE = 8
+PADDING_PATCH = "end"
+D_MODEL = 128
+N_HEADS = 16
+N_LAYERS = 3
+D_FF = 256
+DROPOUT = 0.2
+ATTN_DROPOUT = 0.0
+FC_DROPOUT = 0.2
+HEAD_DROPOUT = 0.0
+VAL_RATIO = 0.1
+TEST_RATIO = 0.2
+PATIENCE = 20
+SCHEDULER = "type3"
+SEED = 42
+SCALE = True
+REVIN_AFFINE = False
+
 
 def set_seed(seed: int = 42) -> None:
     random.seed(seed)
@@ -34,65 +53,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data", type=str, required=True, help="Path to a .csv, .npy, or .npz series")
     parser.add_argument("--seq-len", type=int, default=336)
     parser.add_argument("--pred-len", type=int, default=96)
-    parser.add_argument("--patch-len", type=int, default=16)
-    parser.add_argument("--stride", type=int, default=8)
     parser.add_argument(
         "--hierarchical-patching",
         action="store_true",
         help="Enable two-level hierarchical patching with adjacent token merging.",
     )
-    parser.add_argument("--d-model", type=int, default=128)
-    parser.add_argument("--n-heads", type=int, default=16)
-    parser.add_argument("--n-layers", type=int, default=3)
-    parser.add_argument("--d-ff", type=int, default=256)
-    parser.add_argument("--dropout", type=float, default=0.2)
-    parser.add_argument("--attn-dropout", type=float, default=0.0)
-    parser.add_argument("--fc-dropout", type=float, default=0.2)
-    parser.add_argument("--head-dropout", type=float, default=0.0)
-    parser.add_argument(
-        "--padding-patch",
-        type=str,
-        choices=["end", "none"],
-        default="end",
-        help="Patch padding strategy. DLinear ignores this option.",
-    )
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-4)
-    parser.add_argument(
-        "--patience",
-        type=int,
-        default=20,
-        help="Early stopping patience on validation loss",
-    )
-    parser.add_argument(
-        "--scheduler",
-        type=str,
-        choices=["type3", "none"],
-        default="type3",
-        help="Learning rate scheduler for supervised training",
-    )
     parser.add_argument(
         "--disable-early-stopping",
         action="store_true",
         help="Disable early stopping and run the full requested number of epochs.",
     )
-    parser.add_argument("--val-ratio", type=float, default=0.1)
-    parser.add_argument("--test-ratio", type=float, default=0.2)
-    parser.add_argument("--no-scale", action="store_true", help="Disable train-split normalization")
-    parser.add_argument(
-        "--revin-affine",
-        action="store_true",
-        help="Enable affine parameters in RevIN.",
-    )
-    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--checkpoint", type=str, default="checkpoints/model_best.pt")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument(
-        "--compile",
-        action="store_true",
-        help="Compile the model with torch.compile before training.",
-    )
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -105,19 +80,19 @@ def build_patchtst_config(args: argparse.Namespace) -> PatchTSTConfig:
     return PatchTSTConfig(
         seq_len=args.seq_len,
         pred_len=args.pred_len,
-        patch_len=args.patch_len,
-        stride=args.stride,
+        patch_len=PATCH_LEN,
+        stride=STRIDE,
         hierarchical_patching=args.hierarchical_patching,
-        d_model=args.d_model,
-        n_heads=args.n_heads,
-        n_layers=args.n_layers,
-        d_ff=args.d_ff,
-        dropout=args.dropout,
-        attn_dropout=args.attn_dropout,
-        fc_dropout=args.fc_dropout,
-        head_dropout=args.head_dropout,
-        revin_affine=args.revin_affine,
-        padding_patch=None if args.padding_patch == "none" else args.padding_patch,
+        d_model=D_MODEL,
+        n_heads=N_HEADS,
+        n_layers=N_LAYERS,
+        d_ff=D_FF,
+        dropout=DROPOUT,
+        attn_dropout=ATTN_DROPOUT,
+        fc_dropout=FC_DROPOUT,
+        head_dropout=HEAD_DROPOUT,
+        revin_affine=REVIN_AFFINE,
+        padding_patch=PADDING_PATCH,
     )
 
 
@@ -283,7 +258,7 @@ def build_model(
 
 def main() -> None:
     args = parse_args()
-    set_seed(args.seed)
+    set_seed(SEED)
 
     checkpoint_path = Path(args.checkpoint)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
@@ -292,27 +267,25 @@ def main() -> None:
         data_path=Path(args.data),
         seq_len=args.seq_len,
         pred_len=args.pred_len,
-        val_ratio=args.val_ratio,
-        test_ratio=args.test_ratio,
-        scale=not args.no_scale,
+        val_ratio=VAL_RATIO,
+        test_ratio=TEST_RATIO,
+        scale=SCALE,
     )
     train_loader = DataLoader(bundle.train, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(bundle.val, batch_size=args.batch_size, shuffle=False)
 
     model, config_dict = build_model(args, bundle.in_channels)
     model = model.to(args.device)
-    if args.compile:
-        model = torch.compile(model)
 
     metadata: dict[str, Any] = {
         "in_channels": bundle.in_channels,
         "data_path": str(Path(args.data)),
-        "val_ratio": args.val_ratio,
-        "test_ratio": args.test_ratio,
-        "scale": not args.no_scale,
+        "val_ratio": VAL_RATIO,
+        "test_ratio": TEST_RATIO,
+        "scale": SCALE,
         "best_val_loss": float("inf"),
         "training_stage": "supervised",
-        "seed": args.seed,
+        "seed": SEED,
     }
 
     train_forecast(
@@ -322,8 +295,8 @@ def main() -> None:
         device=args.device,
         epochs=args.epochs,
         lr=args.lr,
-        scheduler=args.scheduler,
-        patience=args.patience,
+        scheduler=SCHEDULER,
+        patience=PATIENCE,
         early_stopping_enabled=not args.disable_early_stopping,
         checkpoint_path=checkpoint_path,
         config_dict=config_dict,
