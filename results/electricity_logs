@@ -1,0 +1,626 @@
+ Running electricity supervised dlinear pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+supervised 1/100 - lr: 0.0001 - train_loss: 0.2982 - val_loss: 0.1743
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.1813 - val_loss: 0.1493
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.1642 - val_loss: 0.1384
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.1562 - val_loss: 0.1330
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.1519 - val_loss: 0.1298
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.1493 - val_loss: 0.1276
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.1476 - val_loss: 0.1261
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.1464 - val_loss: 0.1252
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.1455 - val_loss: 0.1244
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.1448 - val_loss: 0.1239
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.1443 - val_loss: 0.1234
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.1439 - val_loss: 0.1232
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.1436 - val_loss: 0.1229
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.1434 - val_loss: 0.1226
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.1432 - val_loss: 0.1224
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.1430 - val_loss: 0.1223
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.1429 - val_loss: 0.1221
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.1427 - val_loss: 0.1220
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.1426 - val_loss: 0.1219
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.1426 - val_loss: 0.1219
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.1425 - val_loss: 0.1218
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.1424 - val_loss: 0.1217
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.1424 - val_loss: 0.1216
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.1423 - val_loss: 0.1216
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.1423 - val_loss: 0.1215
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.1422 - val_loss: 0.1215
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.1422 - val_loss: 0.1215
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.1422 - val_loss: 0.1215
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.1421 - val_loss: 0.1214
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.1421 - val_loss: 0.1214
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.1421 - val_loss: 0.1214
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.1421 - val_loss: 0.1213
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.1420 - val_loss: 0.1214
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.1420 - val_loss: 0.1213
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.1420 - val_loss: 0.1213
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.1420 - val_loss: 0.1213
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.1420 - val_loss: 0.1213
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.1420 - val_loss: 0.1213
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.1420 - val_loss: 0.1213
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.1420 - val_loss: 0.1213
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.1420 - val_loss: 0.1213
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.1420 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.1419 - val_loss: 0.1213
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 57/100 - lr: 3.38139e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 58/100 - lr: 3.04325e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 59/100 - lr: 2.73893e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 60/100 - lr: 2.46503e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 61/100 - lr: 2.21853e-07 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 62/100 - lr: 1.99668e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 63/100 - lr: 1.79701e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 64/100 - lr: 1.61731e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 65/100 - lr: 1.45558e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 66/100 - lr: 1.31002e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 67/100 - lr: 1.17902e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 68/100 - lr: 1.06112e-07 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 69/100 - lr: 9.55005e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 70/100 - lr: 8.59504e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 71/100 - lr: 7.73554e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 72/100 - lr: 6.96199e-08 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 73/100 - lr: 6.26579e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 74/100 - lr: 5.63921e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 75/100 - lr: 5.07529e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 76/100 - lr: 4.56776e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 77/100 - lr: 4.11098e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 78/100 - lr: 3.69988e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 79/100 - lr: 3.3299e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 80/100 - lr: 2.99691e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 81/100 - lr: 2.69722e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 82/100 - lr: 2.42749e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 83/100 - lr: 2.18475e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 84/100 - lr: 1.96627e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 85/100 - lr: 1.76964e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 86/100 - lr: 1.59268e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 87/100 - lr: 1.43341e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 88/100 - lr: 1.29007e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 89/100 - lr: 1.16106e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 90/100 - lr: 1.04496e-08 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 91/100 - lr: 9.40461e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 92/100 - lr: 8.46415e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 93/100 - lr: 7.61773e-09 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 94/100 - lr: 6.85596e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 95/100 - lr: 6.17037e-09 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 96/100 - lr: 5.55333e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 97/100 - lr: 4.998e-09 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 98/100 - lr: 4.4982e-09 - train_loss: 0.1419 - val_loss: 0.1212
+supervised 99/100 - lr: 4.04838e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+supervised 100/100 - lr: 3.64354e-09 - train_loss: 0.1419 - val_loss: 0.1212
+Saved metrics to summary in Drive!
+Running electricity supervised patchtst42 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+supervised 1/100 - lr: 0.0001 - train_loss: 0.2131 - val_loss: 0.1251
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.1696 - val_loss: 0.1235
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.1580 - val_loss: 0.1205
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.1506 - val_loss: 0.1204
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.1462 - val_loss: 0.1185
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.1432 - val_loss: 0.1173
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.1411 - val_loss: 0.1172
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.1397 - val_loss: 0.1167
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.1385 - val_loss: 0.1166
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.1376 - val_loss: 0.1161
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.1368 - val_loss: 0.1162
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.1362 - val_loss: 0.1156
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.1357 - val_loss: 0.1156
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.1353 - val_loss: 0.1149
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.1349 - val_loss: 0.1144
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.1346 - val_loss: 0.1146
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.1343 - val_loss: 0.1143
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.1341 - val_loss: 0.1144
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.1339 - val_loss: 0.1142
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.1337 - val_loss: 0.1138
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.1336 - val_loss: 0.1138
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.1335 - val_loss: 0.1139
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.1333 - val_loss: 0.1138
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.1332 - val_loss: 0.1139
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.1331 - val_loss: 0.1136
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.1330 - val_loss: 0.1136
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.1329 - val_loss: 0.1137
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.1329 - val_loss: 0.1136
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.1328 - val_loss: 0.1134
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.1327 - val_loss: 0.1135
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.1327 - val_loss: 0.1135
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.1326 - val_loss: 0.1134
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.1326 - val_loss: 0.1134
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.1325 - val_loss: 0.1134
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.1325 - val_loss: 0.1134
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.1324 - val_loss: 0.1133
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.1324 - val_loss: 0.1134
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.1324 - val_loss: 0.1132
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.1324 - val_loss: 0.1132
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.1324 - val_loss: 0.1133
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.1323 - val_loss: 0.1132
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.1323 - val_loss: 0.1132
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.1322 - val_loss: 0.1132
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.1322 - val_loss: 0.1132
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.1322 - val_loss: 0.1131
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 57/100 - lr: 3.38139e-07 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 58/100 - lr: 3.04325e-07 - train_loss: 0.1322 - val_loss: 0.1131
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 59/100 - lr: 2.73893e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 60/100 - lr: 2.46503e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 61/100 - lr: 2.21853e-07 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 62/100 - lr: 1.99668e-07 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 63/100 - lr: 1.79701e-07 - train_loss: 0.1322 - val_loss: 0.1131
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 64/100 - lr: 1.61731e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 65/100 - lr: 1.45558e-07 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 66/100 - lr: 1.31002e-07 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 67/100 - lr: 1.17902e-07 - train_loss: 0.1321 - val_loss: 0.1132
+supervised 68/100 - lr: 1.06112e-07 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 69/100 - lr: 9.55005e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 70/100 - lr: 8.59504e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 71/100 - lr: 7.73554e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 72/100 - lr: 6.96199e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 73/100 - lr: 6.26579e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 74/100 - lr: 5.63921e-08 - train_loss: 0.1322 - val_loss: 0.1131
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 75/100 - lr: 5.07529e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 76/100 - lr: 4.56776e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 77/100 - lr: 4.11098e-08 - train_loss: 0.1321 - val_loss: 0.1131
+supervised 78/100 - lr: 3.69988e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 79/100 - lr: 3.3299e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 80/100 - lr: 2.99691e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 81/100 - lr: 2.69722e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 82/100 - lr: 2.42749e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 83/100 - lr: 2.18475e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 84/100 - lr: 1.96627e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 85/100 - lr: 1.76964e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 86/100 - lr: 1.59268e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 87/100 - lr: 1.43341e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 88/100 - lr: 1.29007e-08 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 89/100 - lr: 1.16106e-08 - train_loss: 0.1322 - val_loss: 0.1131
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+supervised 90/100 - lr: 1.04496e-08 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 91/100 - lr: 9.40461e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 92/100 - lr: 8.46415e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 93/100 - lr: 7.61773e-09 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 94/100 - lr: 6.85596e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 95/100 - lr: 6.17037e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 96/100 - lr: 5.55333e-09 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 97/100 - lr: 4.998e-09 - train_loss: 0.1322 - val_loss: 0.1132
+supervised 98/100 - lr: 4.4982e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 99/100 - lr: 4.04838e-09 - train_loss: 0.1322 - val_loss: 0.1131
+supervised 100/100 - lr: 3.64354e-09 - train_loss: 0.1322 - val_loss: 0.1132
+Saved metrics to summary in Drive!
+Running electricity supervised patchtst64 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+supervised 1/100 - lr: 0.0001 - train_loss: 0.2083 - val_loss: 0.1230
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.1654 - val_loss: 0.1189
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.1542 - val_loss: 0.1165
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.1469 - val_loss: 0.1165
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.1423 - val_loss: 0.1147
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.1393 - val_loss: 0.1152
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.1373 - val_loss: 0.1138
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.1360 - val_loss: 0.1130
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.1349 - val_loss: 0.1131
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.1342 - val_loss: 0.1124
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.1337 - val_loss: 0.1127
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.1332 - val_loss: 0.1121
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.1327 - val_loss: 0.1116
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.1324 - val_loss: 0.1119
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.1321 - val_loss: 0.1114
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.1318 - val_loss: 0.1118
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.1316 - val_loss: 0.1111
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.1313 - val_loss: 0.1115
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.1311 - val_loss: 0.1109
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.1311 - val_loss: 0.1108
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.1308 - val_loss: 0.1108
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.1307 - val_loss: 0.1105
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.1305 - val_loss: 0.1106
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.1304 - val_loss: 0.1104
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.1303 - val_loss: 0.1105
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.1302 - val_loss: 0.1102
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.1301 - val_loss: 0.1103
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.1300 - val_loss: 0.1103
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.1299 - val_loss: 0.1101
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.1298 - val_loss: 0.1101
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.1298 - val_loss: 0.1101
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.1298 - val_loss: 0.1101
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.1297 - val_loss: 0.1100
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.1297 - val_loss: 0.1100
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.1296 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.1296 - val_loss: 0.1100
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.1295 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.1295 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.1295 - val_loss: 0.1100
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.1294 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.1295 - val_loss: 0.1099
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.1294 - val_loss: 0.1100
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.1294 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.1294 - val_loss: 0.1099
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.1294 - val_loss: 0.1099
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.1294 - val_loss: 0.1099
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.1294 - val_loss: 0.1099
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.1294 - val_loss: 0.1099
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.1294 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.1293 - val_loss: 0.1099
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.1293 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.1293 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.1293 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 57/100 - lr: 3.38139e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 58/100 - lr: 3.04325e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 59/100 - lr: 2.73893e-07 - train_loss: 0.1293 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 60/100 - lr: 2.46503e-07 - train_loss: 0.1293 - val_loss: 0.1098
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+supervised 61/100 - lr: 2.21853e-07 - train_loss: 0.1293 - val_loss: 0.1099
+supervised 62/100 - lr: 1.99668e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 63/100 - lr: 1.79701e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 64/100 - lr: 1.61731e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 65/100 - lr: 1.45558e-07 - train_loss: 0.1292 - val_loss: 0.1098
+supervised 66/100 - lr: 1.31002e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 67/100 - lr: 1.17902e-07 - train_loss: 0.1292 - val_loss: 0.1098
+supervised 68/100 - lr: 1.06112e-07 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 69/100 - lr: 9.55005e-08 - train_loss: 0.1292 - val_loss: 0.1098
+supervised 70/100 - lr: 8.59504e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 71/100 - lr: 7.73554e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 72/100 - lr: 6.96199e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 73/100 - lr: 6.26579e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 74/100 - lr: 5.63921e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 75/100 - lr: 5.07529e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 76/100 - lr: 4.56776e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 77/100 - lr: 4.11098e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 78/100 - lr: 3.69988e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 79/100 - lr: 3.3299e-08 - train_loss: 0.1293 - val_loss: 0.1098
+supervised 80/100 - lr: 2.99691e-08 - train_loss: 0.1293 - val_loss: 0.1098
+Early stopping triggered during supervised after 80 epochs.
+Saved metrics to summary in Drive!
+Skipping electricity hierarchical run for DLinear (not supported).
+Running electricity hierarchical patchtst42 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+supervised 1/100 - lr: 0.0001 - train_loss: 0.2158 - val_loss: 0.1279
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.1693 - val_loss: 0.1219
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.1579 - val_loss: 0.1209
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.1511 - val_loss: 0.1188
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.1469 - val_loss: 0.1212
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.1441 - val_loss: 0.1193
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.1421 - val_loss: 0.1166
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.1406 - val_loss: 0.1180
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.1392 - val_loss: 0.1170
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.1382 - val_loss: 0.1174
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.1374 - val_loss: 0.1159
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.1366 - val_loss: 0.1168
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.1362 - val_loss: 0.1166
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.1356 - val_loss: 0.1148
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.1351 - val_loss: 0.1150
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.1347 - val_loss: 0.1152
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.1344 - val_loss: 0.1151
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.1341 - val_loss: 0.1150
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.1338 - val_loss: 0.1145
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.1336 - val_loss: 0.1147
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.1334 - val_loss: 0.1138
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.1333 - val_loss: 0.1140
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.1331 - val_loss: 0.1145
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.1330 - val_loss: 0.1139
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.1328 - val_loss: 0.1142
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.1327 - val_loss: 0.1138
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.1326 - val_loss: 0.1140
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.1325 - val_loss: 0.1143
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.1324 - val_loss: 0.1139
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.1324 - val_loss: 0.1138
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.1323 - val_loss: 0.1139
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.1323 - val_loss: 0.1135
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.1322 - val_loss: 0.1138
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.1322 - val_loss: 0.1136
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.1321 - val_loss: 0.1138
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.1321 - val_loss: 0.1137
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.1321 - val_loss: 0.1139
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.1321 - val_loss: 0.1135
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.1320 - val_loss: 0.1139
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.1320 - val_loss: 0.1134
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.1320 - val_loss: 0.1136
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.1320 - val_loss: 0.1137
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.1319 - val_loss: 0.1137
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.1319 - val_loss: 0.1136
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.1319 - val_loss: 0.1136
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.1319 - val_loss: 0.1135
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.1319 - val_loss: 0.1136
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.1318 - val_loss: 0.1136
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.1319 - val_loss: 0.1134
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.1318 - val_loss: 0.1136
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.1318 - val_loss: 0.1136
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 57/100 - lr: 3.38139e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 58/100 - lr: 3.04325e-07 - train_loss: 0.1318 - val_loss: 0.1136
+supervised 59/100 - lr: 2.73893e-07 - train_loss: 0.1318 - val_loss: 0.1135
+supervised 60/100 - lr: 2.46503e-07 - train_loss: 0.1318 - val_loss: 0.1135
+Early stopping triggered during supervised after 60 epochs.
+Saved metrics to summary in Drive!
+Running electricity hierarchical patchtst64 pred_len=96 on cuda
+Starting supervised on cuda from epoch 0 to 100...
+/usr/local/lib/python3.12/dist-packages/torch/_inductor/compile_fx.py:321: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+supervised 1/100 - lr: 0.0001 - train_loss: 0.2126 - val_loss: 0.1290
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 2/100 - lr: 0.0001 - train_loss: 0.1677 - val_loss: 0.1239
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 3/100 - lr: 0.0001 - train_loss: 0.1556 - val_loss: 0.1171
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 4/100 - lr: 9e-05 - train_loss: 0.1487 - val_loss: 0.1186
+supervised 5/100 - lr: 8.1e-05 - train_loss: 0.1445 - val_loss: 0.1148
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 6/100 - lr: 7.29e-05 - train_loss: 0.1415 - val_loss: 0.1147
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 7/100 - lr: 6.561e-05 - train_loss: 0.1393 - val_loss: 0.1155
+supervised 8/100 - lr: 5.9049e-05 - train_loss: 0.1374 - val_loss: 0.1127
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 9/100 - lr: 5.31441e-05 - train_loss: 0.1361 - val_loss: 0.1123
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 10/100 - lr: 4.78297e-05 - train_loss: 0.1347 - val_loss: 0.1128
+supervised 11/100 - lr: 4.30467e-05 - train_loss: 0.1339 - val_loss: 0.1123
+supervised 12/100 - lr: 3.8742e-05 - train_loss: 0.1331 - val_loss: 0.1124
+supervised 13/100 - lr: 3.48678e-05 - train_loss: 0.1326 - val_loss: 0.1115
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 14/100 - lr: 3.13811e-05 - train_loss: 0.1321 - val_loss: 0.1111
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 15/100 - lr: 2.8243e-05 - train_loss: 0.1315 - val_loss: 0.1107
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 16/100 - lr: 2.54187e-05 - train_loss: 0.1312 - val_loss: 0.1114
+supervised 17/100 - lr: 2.28768e-05 - train_loss: 0.1308 - val_loss: 0.1109
+supervised 18/100 - lr: 2.05891e-05 - train_loss: 0.1305 - val_loss: 0.1108
+supervised 19/100 - lr: 1.85302e-05 - train_loss: 0.1303 - val_loss: 0.1113
+supervised 20/100 - lr: 1.66772e-05 - train_loss: 0.1301 - val_loss: 0.1110
+supervised 21/100 - lr: 1.50095e-05 - train_loss: 0.1299 - val_loss: 0.1106
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 22/100 - lr: 1.35085e-05 - train_loss: 0.1297 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 23/100 - lr: 1.21577e-05 - train_loss: 0.1296 - val_loss: 0.1105
+supervised 24/100 - lr: 1.09419e-05 - train_loss: 0.1295 - val_loss: 0.1102
+supervised 25/100 - lr: 9.84771e-06 - train_loss: 0.1293 - val_loss: 0.1101
+supervised 26/100 - lr: 8.86294e-06 - train_loss: 0.1291 - val_loss: 0.1102
+supervised 27/100 - lr: 7.97664e-06 - train_loss: 0.1290 - val_loss: 0.1100
+supervised 28/100 - lr: 7.17898e-06 - train_loss: 0.1290 - val_loss: 0.1099
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 29/100 - lr: 6.46108e-06 - train_loss: 0.1290 - val_loss: 0.1104
+supervised 30/100 - lr: 5.81497e-06 - train_loss: 0.1288 - val_loss: 0.1101
+supervised 31/100 - lr: 5.23348e-06 - train_loss: 0.1288 - val_loss: 0.1101
+supervised 32/100 - lr: 4.71013e-06 - train_loss: 0.1287 - val_loss: 0.1097
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 33/100 - lr: 4.23912e-06 - train_loss: 0.1287 - val_loss: 0.1097
+supervised 34/100 - lr: 3.8152e-06 - train_loss: 0.1286 - val_loss: 0.1098
+supervised 35/100 - lr: 3.43368e-06 - train_loss: 0.1286 - val_loss: 0.1098
+supervised 36/100 - lr: 3.09032e-06 - train_loss: 0.1286 - val_loss: 0.1098
+supervised 37/100 - lr: 2.78128e-06 - train_loss: 0.1284 - val_loss: 0.1098
+supervised 38/100 - lr: 2.50316e-06 - train_loss: 0.1284 - val_loss: 0.1098
+supervised 39/100 - lr: 2.25284e-06 - train_loss: 0.1284 - val_loss: 0.1098
+supervised 40/100 - lr: 2.02756e-06 - train_loss: 0.1283 - val_loss: 0.1098
+supervised 41/100 - lr: 1.8248e-06 - train_loss: 0.1283 - val_loss: 0.1098
+supervised 42/100 - lr: 1.64232e-06 - train_loss: 0.1283 - val_loss: 0.1097
+supervised 43/100 - lr: 1.47809e-06 - train_loss: 0.1283 - val_loss: 0.1096
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 44/100 - lr: 1.33028e-06 - train_loss: 0.1283 - val_loss: 0.1097
+supervised 45/100 - lr: 1.19725e-06 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 46/100 - lr: 1.07753e-06 - train_loss: 0.1283 - val_loss: 0.1098
+supervised 47/100 - lr: 9.69774e-07 - train_loss: 0.1283 - val_loss: 0.1096
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 48/100 - lr: 8.72796e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 49/100 - lr: 7.85517e-07 - train_loss: 0.1282 - val_loss: 0.1096
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 50/100 - lr: 7.06965e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 51/100 - lr: 6.36269e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 52/100 - lr: 5.72642e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 53/100 - lr: 5.15378e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 54/100 - lr: 4.6384e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 55/100 - lr: 4.17456e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 56/100 - lr: 3.7571e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 57/100 - lr: 3.38139e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 58/100 - lr: 3.04325e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 59/100 - lr: 2.73893e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 60/100 - lr: 2.46503e-07 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 61/100 - lr: 2.21853e-07 - train_loss: 0.1281 - val_loss: 0.1097
+supervised 62/100 - lr: 1.99668e-07 - train_loss: 0.1281 - val_loss: 0.1096
+Saved checkpoint to /content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+supervised 63/100 - lr: 1.79701e-07 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 64/100 - lr: 1.61731e-07 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 65/100 - lr: 1.45558e-07 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 66/100 - lr: 1.31002e-07 - train_loss: 0.1282 - val_loss: 0.1097
+supervised 67/100 - lr: 1.17902e-07 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 68/100 - lr: 1.06112e-07 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 69/100 - lr: 9.55005e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 70/100 - lr: 8.59504e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 71/100 - lr: 7.73554e-08 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 72/100 - lr: 6.96199e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 73/100 - lr: 6.26579e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 74/100 - lr: 5.63921e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 75/100 - lr: 5.07529e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 76/100 - lr: 4.56776e-08 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 77/100 - lr: 4.11098e-08 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 78/100 - lr: 3.69988e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 79/100 - lr: 3.3299e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 80/100 - lr: 2.99691e-08 - train_loss: 0.1282 - val_loss: 0.1096
+supervised 81/100 - lr: 2.69722e-08 - train_loss: 0.1281 - val_loss: 0.1096
+supervised 82/100 - lr: 2.42749e-08 - train_loss: 0.1281 - val_loss: 0.1096
+Early stopping triggered during supervised after 82 epochs.
+Saved metrics to summary in Drive!
