@@ -39,7 +39,7 @@ For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens fr
 3. Download datasets listed in `data/README.md`
 4. Run training scripts in `code/`
 
-We trained on [INSERT GPU] for approximately [X] hours to get to 100 epochs.
+We trained on NVIDIA A100 GPU.
 
 ## Results / Insights
 
