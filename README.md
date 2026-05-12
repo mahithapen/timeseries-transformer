@@ -9,7 +9,9 @@ This repository contains our CS 4782 final project re-implementation of **"A Tim
 ## Chosen Result
 
 We run supervised forecasting experiments on the **Electricity, Traffic, and Weather** datasets, comparing DLinear with PatchTST/42 and PatchTST/64 style variants with a prediction length of 96. We compare the results to the DLinear model.
-<img width="400" height="293" alt="image" src="https://github.com/user-attachments/assets/164531d0-04ad-4e9e-a302-00e37a636efa" />
+<img width="1006" height="488" alt="image" src="https://github.com/user-attachments/assets/04c4e8fe-502c-4c54-9d64-195bf7704774" />
+
+
 
 ## GitHub Contents
 
