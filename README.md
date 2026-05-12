@@ -8,10 +8,9 @@ This repository contains our CS 4782 final project re-implementation of **"A Tim
 
 ## Chosen Result
 
-We run supervised forecasting experiments on the **Electricity, Traffic, and Weather** datasets, comparing DLinear with PatchTST/42 and PatchTST/64 style variants with a prediction length of 96. We compare the results to the DLinear model.
-<img width="1006" height="488" alt="image" src="https://github.com/user-attachments/assets/04c4e8fe-502c-4c54-9d64-195bf7704774" />
+We reproduce the supervised long-term forecasting results from the PatchTST paper for the **Electricity, Traffic, and Weather** datasets with prediction length 96. This corresponds to the paper's supervised forecasting comparison of DLinear against PatchTST variants with different look-back lengths. We compare DLinear, PatchTST/42 (`seq_len=336`), PatchTST/64 (`seq_len=512`), and our hierarchical PatchTST extension.
 
-
+![Original paper supervised forecasting results](assets/paper-results.png)
 
 ## GitHub Contents
 
@@ -20,7 +19,7 @@ We run supervised forecasting experiments on the **Electricity, Traffic, and Wea
   - `Final_Colab.ipynb`: Jupyter notebook used to train and evaluate our model to generate our results
   - `eval.py`: Python file used to evaluate our model
   - `train.py`: Python file used to train our model
-  - `generate_forecast.py`: Python file used to make future predictions on values that extend beyond the dataset (Ithaca weather predicitons for our poster)
+  - `generate_forecast.py`: Python file used to make future predictions on values that extend beyond the dataset (Ithaca weather predictions for our poster)
   - `preprocess_data.py`: Loads in the time series data, makes the train/val/test split, builds the sliding window datasets
 - `data/`: Dataset download instructions and metadata
 - `results/`: Output tables and logs
@@ -39,7 +38,35 @@ We ran both models and the dLinear model on Weather, Electricity, and Traffic da
 
 1. Create and activate a Python environment
 2. Install dependencies from `code/requirements.txt`
-3. Download datasets listed in `data/README.md`
+3. Download datasets listed in `data/README.md` and save them as:
+   - `data/weather.csv`
+   - `data/electricity.csv`
+   - `data/traffic.csv`
+
+The full benchmark CSVs are not committed because of their size; use `data/README.md` to download them before reproducing the full experiments.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r code/requirements.txt
+```
+
+### Quick Smoke Test
+
+Use the included small weather sample to verify that the training script runs locally without downloading the full benchmark datasets:
+
+```bash
+python code/train.py \
+  --model-type dlinear \
+  --data data/weather_small.csv \
+  --seq-len 24 \
+  --pred-len 12 \
+  --epochs 1 \
+  --batch-size 16 \
+  --checkpoint checkpoints/weather_small_dlinear_smoke.pt
+```
+
+The smoke test checks the code path only; the reported project results use the full Weather, Electricity, and Traffic datasets.
 
 ### Training
 #### DLinear
@@ -133,14 +160,15 @@ Use `code/Final_Colab.ipynb` for the full Colab workflow. The notebook runs:
 
 It saves checkpoints and summary metrics under the configured Drive paths.
 
-We trained on NVIDIA A100 GPU.
+We trained the full experiments on an NVIDIA A100 GPU. CPU training is possible for small smoke tests, but the full 100-epoch benchmark runs are substantially slower without a GPU.
 
 ## Results / Insights
-<img width="448" height="311" alt="image" src="https://github.com/user-attachments/assets/0be41687-45d9-4045-a01e-02085b497454" />
 
-We showed that the PatchTST and HPatch model outperforms dLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we fail to see significant gains from implementing hierarchical patching (HPatch), which we attribute to potential strong local periodicity that may already exist in the current datasets. 
+![Our re-implementation results](assets/our-results.png)
 
-The expected end result of using this GitHub repo is a trained forecasting model checkpoint under the directory `checkpoints/` (the training file will create this directory if it doesn't already exist), test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. The checkpoints are used for evaluation and forecasting without the need for retraining.
+We showed that PatchTST and HPatch outperform DLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we do not see consistent large gains from hierarchical patching (HPatch), which we attribute to the strong local periodicity that may already exist in the current datasets.
+
+The expected end result of using this GitHub repo is a trained forecasting model checkpoint under the directory `checkpoints/` (the training file will create this directory if it doesn't already exist), test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. The final metrics from our runs are in `results/results.csv`; the checkpoint paths listed there are the original Colab/Google Drive paths from training.
 
 ## Conclusion
 
