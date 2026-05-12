@@ -23,16 +23,17 @@ We run supervised forecasting experiments on the **Electricity, Traffic, and Wea
   - `generate_forecast.py`: Python file used to make future predictions on values that extend beyond the dataset (Ithaca weather predicitons for our poster)
   - `preprocess_data.py`: Loads in the time series data, makes the train/val/test split, builds the sliding window datasets
 - `data/`: Dataset download instructions and metadata
-- `results/`: Output tables, plots, and logs
+- `results/`: Output tables and logs
 - `poster/`: Final poster PDF
 - `report/`: Final 2-page report PDF
-- `docs/`: Internal notes and checklists
 
 ## Re-implementation Details
 
-Time series input is first processed through preprocess_data.py to generate a train/test split and generate sliding windows. We implemented our supervised PatchTTST by first using Reversible Instance Normalization, treating each input feature independently (channel independence), and apply patching (grouping local timesteps to a singular token) with a patch length of 16 and a stride of 8. Learnable positional embeddings are added, and this input is then fed into a Transformer encoder with 3 encoder layers. Each layer uses multi-head self-attention with 16 attention heads, followed by residual connection and batch normalization, then a feed-forward network, followed by another residual connection and batch normalization. Finally, we perform forecasting with a linear head. To evaluate our model using MSE and MAE. We train for 100 epochs with early stopping, Adam optimizer, and a learning rate scheduler. We predict for the next 96 time steps and use look-back windows of length 336 and 512.
+Time series input is first processed through preprocess_data.py to generate a train/test split and generate sliding windows. We implemented our supervised PatchTST by first using Reversible Instance Normalization, treating each input feature independently (channel independence), and applying patching (grouping local timesteps to a singular token) with a patch length of 16 and a stride of 8. Learnable positional embeddings are added, and this input is then fed into a Transformer encoder with 3 encoder layers. Each layer uses multi-head self-attention with 16 attention heads, followed by residual connection and batch normalization, then a feed-forward network, followed by another residual connection and batch normalization. Finally, we perform forecasting with a linear head. We evaluate our model using MSE and MAE. We train for 100 epochs with early stopping, Adam optimizer, and a learning rate scheduler. We predict for the next 96 time steps and use look-back windows of length 336 and 512.
 
-For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens from the output of the first layer were merged and projected back to the original embedding dimension before being processed by a second encoder level. The outputs of the first and second layers are combined and forecasting is again performed with a linear head.
+For our HPatch addition, we use 2 Transformer encoder layers. Adjacent tokens from the output of the first layer were merged and projected back to the original embedding dimension before being processed by a second encoder level. The outputs of the first and second layers are combined, and forecasting is again performed with a linear head.
+
+We ran both models and the dLinear model on Weather, Electricity, and Traffic datasets that can be downloaded with the instructions found in the `data/` directory. 
 
 ## Reproduction Steps
 
@@ -137,9 +138,9 @@ We trained on NVIDIA A100 GPU.
 ## Results / Insights
 <img width="448" height="311" alt="image" src="https://github.com/user-attachments/assets/0be41687-45d9-4045-a01e-02085b497454" />
 
-We showed that the PatchTST and HPatch model outperforms dLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we fail to see significant gains from implementing hierarchical patching (HPatch), which we attribute to potential strong local periodicity that may already exist in the current datasets, and its true benefits could be revealed in contexts with greater long-range dependencies. 
+We showed that the PatchTST and HPatch model outperforms dLinear on all three datasets. We report MSE and MAE values comparable to the original paper, even beating it in some cases, such as an MSE of 0.1468 for our PatchTST/64 compared to 0.1490 in the paper. However, we fail to see significant gains from implementing hierarchical patching (HPatch), which we attribute to potential strong local periodicity that may already exist in the current datasets. 
 
-The expected end result of using this GitHub repo is a trained forecasting model checkpoint under the directory checkpoints/ (the training file will create this directory if it doesn't already exist), test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. The checkpoints are used for evaluation and forecasting without the need for retraining.
+The expected end result of using this GitHub repo is a trained forecasting model checkpoint under the directory `checkpoints/` (the training file will create this directory if it doesn't already exist), test-set MSE/MAE metrics, and optional future forecasts saved as CSV files. The checkpoints are used for evaluation and forecasting without the need for retraining.
 
 ## Conclusion
 
