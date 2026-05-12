@@ -1,0 +1,16 @@
+dataset,task,variant,seq_len,pred_len,test_mae,test_mse,checkpoint
+weather,supervised,dlinear,336,96,0.2348928795,0.1739707173,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_dlinear_seq336_pred96.pt
+weather,supervised,patchtst42,336,96,0.1997162225,0.1513195445,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst42_seq336_pred96.pt
+weather,supervised,patchtst64,512,96,0.1963396574,0.1467899457,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_supervised_patchtst64_seq512_pred96.pt
+weather,hierarchical,patchtst42,336,96,0.1969832829,0.1495097091,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst42_seq336_pred96.pt
+weather,hierarchical,patchtst64,512,96,0.1988067926,0.1477826077,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/weather_hierarchical_patchtst64_seq512_pred96.pt
+traffic,supervised,dlinear,336,96,0.2887850668,0.4129435894,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/traffic_supervised_dlinear_seq336_pred96.pt
+traffic,supervised,patchtst42,336,96,0.2618121183,0.3830334059,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/traffic_supervised_patchtst42_seq336_pred96.pt
+electricity,supervised,dlinear,336,96,0.2398261989,0.1416320267,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_dlinear_seq336_pred96.pt
+electricity,supervised,patchtst42,336,96,0.225848743,0.1316529801,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst42_seq336_pred96.pt
+electricity,supervised,patchtst64,512,96,0.224908887,0.1301942096,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_supervised_patchtst64_seq512_pred96.pt
+electricity,hierarchical,patchtst42,336,96,0.2253604815,0.1318705225,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst42_seq336_pred96.pt
+electricity,hierarchical,patchtst64,512,96,0.2237540079,0.1300666152,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/electricity_hierarchical_patchtst64_seq512_pred96.pt
+traffic,supervised,patchtst64,512,96,0.2602498611,0.3767449518,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/traffic_supervised_patchtst64_seq512_pred96.pt
+traffic,hierarchical,patchtst42,336,96,0.2643467126,0.3821773483,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/traffic_hierarchical_patchtst42_seq336_pred96.pt
+traffic,hierarchical,patchtst64,512,96,0.262652,0.376728,/content/drive/MyDrive/DLFinalProject/runs/checkpoints/traffic_hierarchical_patchtst64_seq512_pred96.pt
