@@ -21,7 +21,7 @@ We run supervised forecasting experiments on the **Electricity, Traffic, and Wea
   - `eval.py`: Python file used to evaluate our model
   - `train.py`: Python file used to train our model
   - `generate_forecast.py`: Python file used to make future predictions on values that extend beyond the dataset (Ithaca weather predicitons for our poster)
-  - `generate_forecast.py`: Loads in the time series data, makes the train/val/test split, builds the sliding window datasets
+  - `preprocess_data.py`: Loads in the time series data, makes the train/val/test split, builds the sliding window datasets
 - `data/`: Dataset download instructions and metadata
 - `results/`: Output tables, plots, and logs
 - `poster/`: Final poster PDF
